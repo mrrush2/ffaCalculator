@@ -21,19 +21,22 @@ namespace ffaCalcualtor
         public static IEnumerable<List<player>> bestLineup2 = new List<List<player>>();
         public static List<List<player>> Lineup = new List<List<player>>();
         public static float points = 0;
-        private static String path = "C:/Users/micha/Downloads/ffa_customrankings2019-9 (1).csv";
-        private static String path2 = "C:/Users/micha/Downloads/FanDuel-NFL-2019-11-03-39860-players-list.csv";
+        private static String path = "C:/Users/micha/Downloads/ffa_customrankings2019-12 (1).csv";
+        private static String path2 = "C:/Users/micha/Downloads/FanDuel-NFL-2019-11-24-40674-players-list.csv";
         private static string outputcsv = "C:/Users/micha/Documents/Code/FanduelLineups.csv";
         static void Main(string[] args)
         {
-            readCSV(path, "\"ARI\"", "\"SF\"", "\"HOU\"", "\"JAC\"");
+            readCSV(path, "\"HOU\"", "\"HOU\"", "\"IND\"", "\"IND\"");
                           //QB  RB  WR TE DST 
-            setAllPositions(17, 12, 10, 8, 8);
-            findBest(rb, bestRB, 45);
-            findBest(wr, bestWR, 35);
-            Console.WriteLine(bestWR.Count);
-            Console.WriteLine(bestRB.Count);
-            findBestLineup(130, 40, 115);
+            setAllPositions(20, 12, 10, 7, 8);
+            findBest(rb, bestRB, 40);
+            findBest(wr, bestWR, 38);
+            Console.WriteLine("RB " +bestRB.Count);
+            Console.WriteLine("WR " + bestWR.Count);
+            Console.WriteLine("QB " + qb.Count);
+            Console.WriteLine("TE " + te.Count);
+            Console.WriteLine("DST " + dst.Count);
+            findBestLineup(130, 42, 110);
             Console.WriteLine(bestLineup.Count);
             printLineups();
             //outputCSV();
@@ -61,10 +64,10 @@ namespace ffaCalcualtor
                             if (!values[8].Equals("NA")) lower = float.Parse(values[8]);
                             if (!values[9].Equals("NA")) upper = float.Parse(values[9]);
                             float left = (points - lower) / (upper - points);
-                            Console.WriteLine(points + "  " + lower + "  " + upper + "  " + left);
+                            //Console.WriteLine(points + "  " + lower + "  " + upper + "  " + left);
                             if ((left < 2 && lower < points && upper > points) || values[3].Equals("\"DST\""))
                             {
-                                Console.WriteLine(left);
+                                //Console.WriteLine(left);
                                 values[1] = values[1].Replace(".", "");
                                 values[1] = values[1].Replace("'", "");
                                 data.Add(new player(values[1], values[2], values[3], values[7], values[8], values[9], values[10],
@@ -127,6 +130,19 @@ namespace ffaCalcualtor
                 //float value = (p.points / p.salary) * 1000;
                 //Console.WriteLine(value);
                 if (p.position.Equals(str) && p.points > min)
+                {
+                    //Console.WriteLine(p.points + "  " + p.name + "  " + p.salary);
+                    l.Add(p);
+                }
+            }
+        }
+        public static void setQBPosition(string str, List<player> l, double min, String name)
+        {
+            foreach (player p in data)
+            {
+                //float value = (p.points / p.salary) * 1000;
+                //Console.WriteLine(value);
+                if (p.name.Contains(name))
                 {
                     //Console.WriteLine(p.points + "  " + p.name + "  " + p.salary);
                     l.Add(p);
@@ -244,7 +260,7 @@ namespace ffaCalcualtor
                 Console.WriteLine("points= " + sumPoints(list));
                 Console.WriteLine("salary= " + sumSalary(list));
                 Console.WriteLine("floor= " + sumFloor(list));
-                Console.WriteLine("sdPts= " + sumSdPts(list));
+                Console.WriteLine("Bell= " + sumBell(list));
                 foreach (player p in list)
                 {
                     Console.WriteLine("name= " + p.name);
@@ -302,7 +318,15 @@ namespace ffaCalcualtor
             }
             return sum;
         }
-
+        public static float sumBell(List<player> list)
+        {
+            float sum = 0;
+            foreach (player p in list)
+            {
+                sum += (p.upper - p.points)/(p.points - p.lower);
+            }
+            return sum;
+        }
 
         public static float sumRisk(List<player> list)
         {
@@ -337,54 +361,6 @@ namespace ffaCalcualtor
                 File.WriteAllText(outputcsv, "\n");
             }
         }
-    }
-    public class player
-    {
-        public player(string name, string team, string position, string points, string lower, string upper, string sdPts, string positionRank, string dropoff, string tier, string ptSpread, string positionECR, string sdRank, string risk)
-        {
-            this.name = name;
-            this.team = team;
-            this.position = position;
-            if (!points.Equals("NA")) this.points = float.Parse(points);
-            if (!lower.Equals("NA")) this.lower = float.Parse(lower);
-            if (!upper.Equals("NA")) this.upper = float.Parse(upper);
-            if (!sdPts.Equals("NA") && !sdPts.Equals("Inf")) this.sdPts = float.Parse(sdPts);
-            if (!positionRank.Equals("NA")) this.positionRank = int.Parse(positionRank);
-            if (!dropoff.Equals("NA")) this.dropoff = float.Parse(dropoff);
-            if (!tier.Equals("NA")) this.tier = int.Parse(tier);
-            if (!ptSpread.Equals("NA")) this.ptSpread = float.Parse(ptSpread);
-            if (!positionECR.Equals("NA")) this.positionECR = float.Parse(positionECR);
-            if (!sdRank.Equals("NA")) this.sdRank = float.Parse(sdRank);
-            if (!risk.Equals("NA")) this.risk = float.Parse(risk);
-            this.salary = 10000;
-        }
-
-        public bool Equals(player p)
-        {
-            if (this.name.Equals(p.name)) return true;
-            return false;
-        }
-        public string toString()
-        {
-            return (position + ", " + name + ", " + points + ", " + lower + ", " + salary + ", " + risk);
-        }
-
-        public string name { get; set; }
-        public string team { get; set; }
-        public string position { get; set; }
-        public float points { get; set; }
-        public float lower { get; set; }
-        public float upper { get; set; }
-        public float sdPts { get; set; }
-        public int positionRank { get; set; }
-        public float dropoff { get; set; }
-        public int tier { get; set; }
-        public float ptSpread { get; set; }
-        public float positionECR { get; set; }
-        public float sdRank { get; set; }
-        public float risk { get; set; }
-        public int salary=10000;
-        public void setSalary(int num) { this.salary = num; }
     }
 
 }

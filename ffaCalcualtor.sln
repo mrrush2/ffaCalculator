@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29411.108
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ffaCalcualtor", "ffaCalcualtor.csproj", "{6CE9D846-4071-456C-9D13-B81A834FB418}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6CE9D846-4071-456C-9D13-B81A834FB418}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6CE9D846-4071-456C-9D13-B81A834FB418}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6CE9D846-4071-456C-9D13-B81A834FB418}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6CE9D846-4071-456C-9D13-B81A834FB418}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C55B1E53-7EB1-4736-961B-7715B3C96F7A}
+	EndGlobalSection
+EndGlobal
