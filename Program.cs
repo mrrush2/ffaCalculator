@@ -21,29 +21,100 @@ namespace ffaCalcualtor
         public static IEnumerable<List<player>> bestLineup2 = new List<List<player>>();
         public static List<List<player>> Lineup = new List<List<player>>();
         public static float points = 0;
-        private static String path = "C:/Users/micha/Downloads/ffa_customrankings2019-12 (1).csv";
-        private static String path2 = "C:/Users/micha/Downloads/FanDuel-NFL-2019-11-24-40674-players-list.csv";
+        private static String path = "C:/Users/micha/Downloads/ffa_customrankings2019-15 (2).csv";
+        private static String path2 = "C:/Users/micha/Downloads/FanDuel-NFL-2019-12-15-41472-players-list.csv";
         private static string outputcsv = "C:/Users/micha/Documents/Code/FanduelLineups.csv";
         static void Main(string[] args)
         {
-            readCSV(path, "\"HOU\"", "\"HOU\"", "\"IND\"", "\"IND\"");
-                          //QB  RB  WR TE DST 
-            setAllPositions(20, 12, 10, 7, 8);
+            readCSV(path, "\"BAL\"", "\"NYJ\"");
+            //QB  RB  WR TE DST 
+            setAllPositions(18, 12, 10, 10, 10);
+            //setAllPositionsQb("Eli Manning", 12, 10, 10, 10);
+            //setAllPositionsDst(18, 12, 10, 10, "Patriots");
             findBest(rb, bestRB, 40);
-            findBest(wr, bestWR, 38);
+            findBest(wr, bestWR, 40);
             Console.WriteLine("RB " +bestRB.Count);
             Console.WriteLine("WR " + bestWR.Count);
             Console.WriteLine("QB " + qb.Count);
             Console.WriteLine("TE " + te.Count);
             Console.WriteLine("DST " + dst.Count);
-            findBestLineup(130, 42, 110);
+            findBestLineup(130, 42, 100);
             Console.WriteLine(bestLineup.Count);
             printLineups();
             //outputCSV();
             Console.WriteLine("done");
             Console.ReadKey();
         }
+        public static void readCSV(String path, string team1, string team2)
+        {
+            using (var reader = new StreamReader(path))
+            {
+                bool first = false;
+                while (!reader.EndOfStream)
+                {
+                    var line = reader.ReadLine();
+                    var values = line.Split(',');
+                    if (first)
+                    {
+                        if (!values[2].Equals(team1) && !values[2].Equals(team2))
+                        {
+                            float points = 0;
+                            float lower = 0;
+                            float upper = 0;
+                            if (!values[7].Equals("NA")) points = float.Parse(values[7]);
+                            if (!values[8].Equals("NA")) lower = float.Parse(values[8]);
+                            if (!values[9].Equals("NA")) upper = float.Parse(values[9]);
+                            float left = (points - lower) / (upper - points);
+                            //Console.WriteLine(points + "  " + lower + "  " + upper + "  " + left);
+                            if ((lower < points && upper > points) || values[3].Equals("\"DST\""))
+                            {
+                                //Console.WriteLine(left);
+                                values[1] = values[1].Replace(".", "");
+                                values[1] = values[1].Replace("'", "");
+                                data.Add(new player(values[1], values[2], values[3], values[7], values[8], values[9], values[10],
+                                    values[11], values[12], values[13], values[14], values[16], values[17], values[18]));
+                            }
 
+                        }
+                    }
+                    else first = true;
+                }
+            }
+            using (var reader = new StreamReader(path2))
+            {
+                bool first = false;
+                while (!reader.EndOfStream)
+                {
+                    var line = reader.ReadLine();
+                    var values = line.Split(',');
+                    values[3] = values[3].Replace("'", "");
+                    values[3] = values[3].Replace(".", "");
+                    //values[3] = values[3].Replace(" Jr", "");
+                    //values[3] = values[3].Replace(" IV", "");
+                    //values[3] = values[3].Replace(" III", "");
+                    //values[3] = values[3].Replace(" II", "");
+                    if (first)
+                    {
+                        foreach (player p in data)
+                        {
+                            string str = p.name.Replace("\"", "");
+                            string pos = p.position.Replace("\"", "");
+                            string str2 = values[1].Replace("\"", "");
+                            string str3 = values[3].Replace("\"", "");
+                            string str4 = values[4].Replace("\"", "");
+                            //Console.WriteLine(pos + "   " + str2);
+                            if ((str3.Contains(str) && str2.Contains(pos)) || str4.Contains(str))
+                            {
+                                int salary = int.Parse(values[7].Replace("\"", ""));
+                                //Console.WriteLine(str + "   " + str3 + "   " + str4 + "    " + salary);
+                                p.setSalary(salary);
+                            }
+                        }
+                    }
+                    else first = true;
+                }
+            }
+        }
         public static void readCSV(String path, string team1, string team2, string team3, string team4)
         {
             using (var reader = new StreamReader(path))
@@ -114,7 +185,79 @@ namespace ffaCalcualtor
                 }
             }
         }
-        
+        public static void readCSV(String path, string team1, string team2, string team3, string team4, string team5, string team6)
+        {
+            using (var reader = new StreamReader(path))
+            {
+                bool first = false;
+                while (!reader.EndOfStream)
+                {
+                    var line = reader.ReadLine();
+                    var values = line.Split(',');
+                    if (first)
+                    {
+                        if (!values[2].Equals(team1) && !values[2].Equals(team2) && !values[2].Equals(team3) && !values[2].Equals(team4) && !values[2].Equals(team5) && !values[2].Equals(team6))
+                        {
+                            float points = 0;
+                            float lower = 0;
+                            float upper = 0;
+                            //Console.WriteLine(values[1]);
+                            if (!values[7].Equals("NA")) points = float.Parse(values[7]);
+                            if (!values[8].Equals("NA")) lower = float.Parse(values[8]);
+                            if (!values[9].Equals("NA")) upper = float.Parse(values[9]);
+                            float left = (points - lower) / (upper - points);
+                            //Console.WriteLine(points + "  " + lower + "  " + upper + "  " + left);
+                            if ((lower < points && upper > points) || values[3].Equals("\"DST\""))
+                            {
+                                //Console.WriteLine(left);
+                                //Console.WriteLine(values[1]);
+                                values[1] = values[1].Replace(".", "");
+                                values[1] = values[1].Replace("'", "");
+                                data.Add(new player(values[1], values[2], values[3], values[7], values[8], values[9], values[10],
+                                    values[11], values[12], values[13], values[14], values[16], values[17], values[18]));
+                            }
+
+                        }
+                    }
+                    else first = true;
+                }
+            }
+            using (var reader = new StreamReader(path2))
+            {
+                bool first = false;
+                while (!reader.EndOfStream)
+                {
+                    var line = reader.ReadLine();
+                    var values = line.Split(',');
+                    values[3] = values[3].Replace("'", "");
+                    values[3] = values[3].Replace(".", "");
+                    //values[3] = values[3].Replace(" Jr", "");
+                    //values[3] = values[3].Replace(" IV", "");
+                    //values[3] = values[3].Replace(" III", "");
+                    //values[3] = values[3].Replace(" II", "");
+                    if (first)
+                    {
+                        foreach (player p in data)
+                        {
+                            string str = p.name.Replace("\"", "");
+                            string pos = p.position.Replace("\"", "");
+                            string str2 = values[1].Replace("\"", "");
+                            string str3 = values[3].Replace("\"", "");
+                            string str4 = values[4].Replace("\"", "");
+                            Console.WriteLine(pos + "   " + str2);
+                            if ((str3.Contains(str) && str2.Contains(pos)) || str4.Contains(str))
+                            {
+                                int salary = int.Parse(values[7].Replace("\"", ""));
+                                //Console.WriteLine(str + "   " + str3 + "   " + str4 + "    " + salary);
+                                p.setSalary(salary);
+                            }
+                        }
+                    }
+                    else first = true;
+                }
+            }
+        }
+
         public static void setAllPositions(double qbmin, double rbmin, double wrmin, double temin, double dstmin)
         {
             setPosition("\"QB\"", qb, qbmin);
@@ -123,6 +266,34 @@ namespace ffaCalcualtor
             setPosition("\"TE\"", te, temin);
             setPosition("\"DST\"", dst, dstmin);
         }
+
+        public static void setAllPositionsQb(string qbName, double rbmin, double wrmin, double temin, double dstmin)
+        {
+            setQBPosition("\"QB\"", qb, qbName);
+            setPosition("\"RB\"", rb, rbmin);
+            setPosition("\"WR\"", wr, wrmin);
+            setPosition("\"TE\"", te, temin);
+            setPosition("\"DST\"", dst, dstmin);
+        }
+
+        public static void setAllPositionsTe(double qbmin, double rbmin, double wrmin, string tename, double dstmin)
+        {
+            setPosition("\"QB\"", qb, qbmin);
+            setPosition("\"RB\"", rb, rbmin);
+            setPosition("\"WR\"", wr, wrmin);
+            setTePosition("\"TE\"", te, tename);
+            setPosition("\"DST\"", dst, dstmin);
+        }
+
+        public static void setAllPositionsDst(double qbmin, double rbmin, double wrmin, double temin, string dstname)
+        {
+            setPosition("\"QB\"", qb, qbmin);
+            setPosition("\"RB\"", rb, rbmin);
+            setPosition("\"WR\"", wr, wrmin);
+            setPosition("\"TE\"", te, temin);
+            setDstPosition("\"DST\"", dst, dstname);
+        }
+
         public static void setPosition(string str, List<player> l, double min)
         {
             foreach (player p in data)
@@ -136,15 +307,35 @@ namespace ffaCalcualtor
                 }
             }
         }
-        public static void setQBPosition(string str, List<player> l, double min, String name)
+        public static void setQBPosition(string str, List<player> l, String name)
         {
             foreach (player p in data)
             {
-                //float value = (p.points / p.salary) * 1000;
-                //Console.WriteLine(value);
-                if (p.name.Contains(name))
+                if (p.position.Equals(str) && p.name.Contains(name))
                 {
-                    //Console.WriteLine(p.points + "  " + p.name + "  " + p.salary);
+                    Console.WriteLine(p.name);
+                    l.Add(p);
+                }
+            }
+        }
+        public static void setTePosition(string str, List<player> l, String name)
+        {
+            foreach (player p in data)
+            {
+                if (p.position.Equals(str) && p.name.Contains(name))
+                {
+                    Console.WriteLine(p.name);
+                    l.Add(p);
+                }
+            }
+        }
+        public static void setDstPosition(string str, List<player> l, String name)
+        {
+            foreach (player p in data)
+            {
+                if (p.position.Equals(str) && p.name.Contains(name))
+                {
+                    Console.WriteLine(p.name);
                     l.Add(p);
                 }
             }
