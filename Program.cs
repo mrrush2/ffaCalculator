@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Threading;
 
 namespace ffaCalcualtor
 {
@@ -17,30 +18,39 @@ namespace ffaCalcualtor
         public static List<player> dst = new List<player>();
         public static List<List<player>> bestRB = new List<List<player>>();
         public static List<List<player>> bestWR = new List<List<player>>();
-        public static List<List<player>> bestLineup = new List<List<player>>();
-        public static IEnumerable<List<player>> bestLineup2 = new List<List<player>>();
+        public static List<List<player>> bestLineups = new List<List<player>>();
+        public static IEnumerable<List<player>> bestLineups2 = new List<List<player>>();
         public static List<List<player>> Lineup = new List<List<player>>();
         public static float points = 0;
-        private static String path = "C:/Users/micha/Downloads/ffa_customrankings2019-15 (2).csv";
-        private static String path2 = "C:/Users/micha/Downloads/FanDuel-NFL-2019-12-15-41472-players-list.csv";
+        private static String path = "C:/Users/micha/Downloads/ffa_customrankings2020-3.csv";
+        private static String path2 = "C:/Users/micha/Downloads/FanDuel-NFL-2020-09-27-50210-players-list.csv";
         private static string outputcsv = "C:/Users/micha/Documents/Code/FanduelLineups.csv";
+
+        private static List<Thread> threads = new List<Thread>();
+        private static List<List<List<player>>> threadLineups = new List<List<List<player>>>();
+
         static void Main(string[] args)
         {
-            readCSV(path, "\"BAL\"", "\"NYJ\"");
+            readCSV(path, "\"CLE\"", "\"CIN\"");
             //QB  RB  WR TE DST 
-            setAllPositions(18, 12, 10, 10, 10);
+            setAllPositions(18, 12,11, 8, 9);
             //setAllPositionsQb("Eli Manning", 12, 10, 10, 10);
             //setAllPositionsDst(18, 12, 10, 10, "Patriots");
             findBest(rb, bestRB, 40);
             findBest(wr, bestWR, 40);
+            //findBest2(rb, bestRB, 30);
+            //findBest4(wr, bestWR, 56);
             Console.WriteLine("RB " +bestRB.Count);
             Console.WriteLine("WR " + bestWR.Count);
             Console.WriteLine("QB " + qb.Count);
             Console.WriteLine("TE " + te.Count);
             Console.WriteLine("DST " + dst.Count);
-            findBestLineup(130, 42, 100);
-            Console.WriteLine(bestLineup.Count);
-            printLineups();
+            findLineups(130, 42, 100);
+            //findBestLineup(130, 42, 100);
+            consolidateThreadRosters(threadLineups);
+            Console.WriteLine(bestLineups.Count);
+            printLineupsThreads();
+            //printLineups();
             //outputCSV();
             Console.WriteLine("done");
             Console.ReadKey();
@@ -244,7 +254,7 @@ namespace ffaCalcualtor
                             string str2 = values[1].Replace("\"", "");
                             string str3 = values[3].Replace("\"", "");
                             string str4 = values[4].Replace("\"", "");
-                            Console.WriteLine(pos + "   " + str2);
+                            //Console.WriteLine(pos + "   " + str2);
                             if ((str3.Contains(str) && str2.Contains(pos)) || str4.Contains(str))
                             {
                                 int salary = int.Parse(values[7].Replace("\"", ""));
@@ -267,39 +277,13 @@ namespace ffaCalcualtor
             setPosition("\"DST\"", dst, dstmin);
         }
 
-        public static void setAllPositionsQb(string qbName, double rbmin, double wrmin, double temin, double dstmin)
-        {
-            setQBPosition("\"QB\"", qb, qbName);
-            setPosition("\"RB\"", rb, rbmin);
-            setPosition("\"WR\"", wr, wrmin);
-            setPosition("\"TE\"", te, temin);
-            setPosition("\"DST\"", dst, dstmin);
-        }
-
-        public static void setAllPositionsTe(double qbmin, double rbmin, double wrmin, string tename, double dstmin)
-        {
-            setPosition("\"QB\"", qb, qbmin);
-            setPosition("\"RB\"", rb, rbmin);
-            setPosition("\"WR\"", wr, wrmin);
-            setTePosition("\"TE\"", te, tename);
-            setPosition("\"DST\"", dst, dstmin);
-        }
-
-        public static void setAllPositionsDst(double qbmin, double rbmin, double wrmin, double temin, string dstname)
-        {
-            setPosition("\"QB\"", qb, qbmin);
-            setPosition("\"RB\"", rb, rbmin);
-            setPosition("\"WR\"", wr, wrmin);
-            setPosition("\"TE\"", te, temin);
-            setDstPosition("\"DST\"", dst, dstname);
-        }
-
         public static void setPosition(string str, List<player> l, double min)
         {
             foreach (player p in data)
             {
                 //float value = (p.points / p.salary) * 1000;
                 //Console.WriteLine(value);
+                //Console.WriteLine(p.name);
                 if (p.position.Equals(str) && p.points > min)
                 {
                     //Console.WriteLine(p.points + "  " + p.name + "  " + p.salary);
@@ -307,39 +291,7 @@ namespace ffaCalcualtor
                 }
             }
         }
-        public static void setQBPosition(string str, List<player> l, String name)
-        {
-            foreach (player p in data)
-            {
-                if (p.position.Equals(str) && p.name.Contains(name))
-                {
-                    Console.WriteLine(p.name);
-                    l.Add(p);
-                }
-            }
-        }
-        public static void setTePosition(string str, List<player> l, String name)
-        {
-            foreach (player p in data)
-            {
-                if (p.position.Equals(str) && p.name.Contains(name))
-                {
-                    Console.WriteLine(p.name);
-                    l.Add(p);
-                }
-            }
-        }
-        public static void setDstPosition(string str, List<player> l, String name)
-        {
-            foreach (player p in data)
-            {
-                if (p.position.Equals(str) && p.name.Contains(name))
-                {
-                    Console.WriteLine(p.name);
-                    l.Add(p);
-                }
-            }
-        }
+
         public static void findBest(List<player> list, List<List<player>> temp, float min)
         {
             
@@ -362,6 +314,50 @@ namespace ffaCalcualtor
                 }
             }
         }
+        public static void findBest2(List<player> list, List<List<player>> temp, float min)
+        {
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                for (int j = i + 1; j < list.Count; j++)
+                {
+                    List<player> best = new List<player>();
+                    best.Add(list.ElementAt(i));
+                    best.Add(list.ElementAt(j));
+                    if (sumPoints(best) > min)
+                    {
+                        //Console.WriteLine(list.ElementAt(i).name + "  " + list.ElementAt(j).name + "  " + list.ElementAt(k).name + "  " + sumPoints(best) + "   " + sumSalary(best));
+                        temp.Add(best);
+                    }
+                }
+            }
+        }
+        public static void findBest4(List<player> list, List<List<player>> temp, float min)
+        {
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                for (int j = i + 1; j < list.Count; j++)
+                {
+                    for (int k = j + 1; k < list.Count; k++)
+                    {
+                        for (int a = k + 1; a < list.Count; a++)
+                        {
+                            List<player> best = new List<player>();
+                            best.Add(list.ElementAt(i));
+                            best.Add(list.ElementAt(j));
+                            best.Add(list.ElementAt(k));
+                            best.Add(list.ElementAt(a)) ;
+                            if (sumPoints(best) > min)
+                            {
+                                //Console.WriteLine(list.ElementAt(i).name + "  " + list.ElementAt(j).name + "  " + list.ElementAt(k).name + "  " + sumPoints(best) + "   " + sumSalary(best));
+                                temp.Add(best);
+                            }
+                        }
+                    }
+                }
+            }
+        }
         public static void findBestLineup(int points, int risk, int floor)
         {
 
@@ -376,40 +372,188 @@ namespace ffaCalcualtor
                         {
                             for(int b = 0; b < dst.Count; b++)
                             {
-                                List<player> best = new List<player>();
-                                best.Add(qb.ElementAt(i));
-                                for(int c = 0; c < bestRB.ElementAt(j).Count; c++)
+                                addTeamToLineup(i, j , k, a, b, points, risk, floor);
+                            }
+                        }
+                    }
+                }
+            }
+            removeLineups();
+        }
+        public static void findLineups(int points, int risk, int floor)
+        {
+            for (int i = 0; i < qb.Count; i++)
+            {
+                Console.WriteLine("thread = " + i);
+                int[] temp = new int[] { points, risk, floor, i };
+                lock (threads)
+                {
+                    Thread t = new Thread(new ParameterizedThreadStart(findLineupsWithQb));
+                    threads.Add(t);
+                    t.Start(temp);
+                }
+            }
+            Console.WriteLine("qbs = " + qb.Count);
+            Console.WriteLine("threads = " + threads.Count);
+            for ( int i = 0; i < threads.Count; i++)
+            {
+                threads.ElementAt(i);
+            }
+        }
+
+        public static void findLineupsWithQb(object args)
+        {
+            Array nums = new object[3];
+            nums = (Array)args;
+            int i = (int)nums.GetValue(3);
+            List<List<player>> roster = new List<List<player>>();
+            //rb
+            for (int j = 0; j < bestRB.Count; j++)
+            {
+                //Console.WriteLine("thread = " + i + " rb = " + j);
+                //wr
+                for (int k = 0; k < bestWR.Count; k++)
+                {
+                    //te
+                    for (int a = 0; a < te.Count; a++)
+                    {
+                        //dst
+                        for (int b = 0; b < dst.Count; b++)
+                        {
+                            List<player> temp = createLineup(i, j, k, a, b, (int)nums.GetValue(0), (int)nums.GetValue(1), (int)nums.GetValue(2));
+                            //Console.WriteLine(sumPoints(temp));
+                            //Console.WriteLine(" j = " + j + " k = " + k + " a = " + a + " b = " + b);
+                            if(temp != null)
+                            {
+                                if (roster.Count < 10)
                                 {
-                                    best.Add(bestRB.ElementAt(j).ElementAt(c));
+                                    //Console.WriteLine("add roster");
+                                    roster.Add(temp);
                                 }
-                                for (int c = 0; c < bestWR.ElementAt(k).Count; c++)
+                                else
                                 {
-                                    best.Add(bestWR.ElementAt(k).ElementAt(c));
-                                }
-                                best.Add(te.ElementAt(a));
-                                best.Add(dst.ElementAt(b));
-                                
-                                if (sumSalary(best) <= 60000 && sumSalary(best) > 59000)
-                                {
-                                    //Console.WriteLine(sumPoints(best) + "  " + sumFloor(best) + "  " + sumRisk(best) + "  " + sumSalary(best));
-                                    if (sumPoints(best) > points && sumSdPts(best) < risk && sumFloor(best) > floor)
-                                    { 
-                                        bestLineup.Add(best);
-                                        //Console.WriteLine(i + " " + j + " " + k + " " + a + " " + b);
-                                        //Console.WriteLine(sumPoints(best));
-                                        //foreach (player p in best)
-                                        //{
-                                        //    Console.WriteLine(p.name + "  " + p.points);
-                                        //}
-                                    }
+                                    checkRoster(roster, temp);
                                 }
                             }
                         }
                     }
                 }
             }
-            Console.WriteLine(bestLineup.Count);
-            foreach(List<player> list in bestLineup)
+            lock (threadLineups)
+            {
+                Console.WriteLine("add roster to thread pool");
+                threadLineups.Add(roster);
+                Console.WriteLine("i = " + i);
+                Thread t = threads.ElementAt(i);
+                //threads.RemoveAt(i);
+                //t.Join();
+            }
+        }
+
+        public static void checkRoster(List<List<player>> roster, List<player> newRoster)
+        {
+            int pos = 0;
+            for (int t = 1; t < roster.Count; t++)
+            {
+                if (sumPoints(roster.ElementAt(t)) < sumPoints(roster.ElementAt(pos)))
+                {
+                    pos = t;
+                }
+            }
+            if (sumPoints(roster.ElementAt(pos)) < sumPoints(newRoster))
+            {
+                //Console.WriteLine("remove and add a roster");
+                roster.RemoveAt(pos);
+                roster.Add(newRoster);
+            }
+        }
+        public static void WaitAll(IEnumerable<Thread> threads)
+        {
+            if (threads != null)
+            {
+                foreach (Thread thread in threads)
+                { thread.Join(); }
+            }
+        }
+
+        public static void consolidateThreadRosters(List<List<List<player>>> tRoster)
+        {
+            //list of 10 best rosters
+            //Thread.Sleep(100000);
+            /*bool waiting = true;
+            while (waiting )
+            {
+                if (threads.Count == 0) waiting = false;
+                else Thread.Sleep(1000);
+            }*/
+            WaitAll(threads);
+            bestLineups = tRoster.ElementAt(0);
+            for (int i = 1; i < tRoster.Count; i++)
+            {
+                for(int j = 0; j < tRoster.ElementAt(i).Count; j++)
+                {
+                    checkRoster(bestLineups, tRoster.ElementAt(i).ElementAt(j));
+                }
+            }
+        }
+
+        private static List<player> createLineup(int i, int j, int k, int a, int b, int points, int risk, int floor)
+        {
+            List<player> temp = new List<player>();
+            temp.Add(qb.ElementAt(i));
+            //Console.WriteLine(qb.ElementAt(i).name);
+            for (int c = 0; c < bestRB.ElementAt(j).Count; c++)
+            {
+                //Console.WriteLine(bestRB.ElementAt(j).ElementAt(c).name);
+                temp.Add(bestRB.ElementAt(j).ElementAt(c));
+            }
+            for (int c = 0; c < bestWR.ElementAt(k).Count; c++)
+            {
+                temp.Add(bestWR.ElementAt(k).ElementAt(c));
+            }
+            temp.Add(te.ElementAt(a));
+            temp.Add(dst.ElementAt(b));
+            //bool twoandfour = (bestRB.ElementAt(j).Count != 3 && bestWR.ElementAt(k).Count != 4) || (bestRB.ElementAt(j).Count != 2 && bestWR.ElementAt(k).Count != 3);
+            if (sumSalary(temp) <= 60000 && sumSalary(temp) > 59000)
+            {
+                //Console.WriteLine(sumPoints(temp) + "  " + sumFloor(temp) + "  " + sumRisk(temp) + "  " + sumSalary(temp));
+                if (sumPoints(temp) > points && sumSdPts(temp) < risk && sumFloor(temp) > floor && temp.Count == 9)
+                {
+                    return (temp);
+                }
+            }
+            return null;
+        }
+
+        private static void addTeamToLineup(int i, int j, int k, int a, int b, int points, int risk, int floor)
+        {
+            List<player> temp = new List<player>();
+            temp.Add(qb.ElementAt(i));
+            for (int c = 0; c < bestRB.ElementAt(j).Count; c++)
+            {
+                temp.Add(bestRB.ElementAt(j).ElementAt(c));
+            }
+            for (int c = 0; c < bestWR.ElementAt(k).Count; c++)
+            {
+                temp.Add(bestWR.ElementAt(k).ElementAt(c));
+            }
+            temp.Add(te.ElementAt(a));
+            temp.Add(dst.ElementAt(b));
+            bool twoandfour = (bestRB.ElementAt(j).Count != 3 && bestWR.ElementAt(k).Count != 4) || (bestRB.ElementAt(j).Count != 2 && bestWR.ElementAt(k).Count != 3);
+            if (sumSalary(temp) <= 60000 && sumSalary(temp) > 59000)
+            {
+                //Console.WriteLine(sumPoints(best) + "  " + sumFloor(best) + "  " + sumRisk(best) + "  " + sumSalary(best));
+                if (sumPoints(temp) > points && sumSdPts(temp) < risk && sumFloor(temp) > floor && temp.Count == 9)
+                {
+                    bestLineups.Add(temp);
+                }
+            }
+        }
+
+        private static void removeLineups()
+        {
+            Console.WriteLine(bestLineups.Count);
+            foreach (List<player> list in bestLineups)
             {
                 //bool temp = false;
                 if (Lineup.Count > 20)
@@ -419,8 +563,8 @@ namespace ffaCalcualtor
                     {
                         if (sumPoints(p) < sumPoints(list) && compareLists(list, p))
                         {
-                            
-                            if (sumPoints(p) < sumPoints(lowestList) || sumPoints(lowestList)== 0)
+
+                            if (sumPoints(p) < sumPoints(lowestList) || sumPoints(lowestList) == 0)
                             {
                                 lowestList = p;
                             }
@@ -428,7 +572,7 @@ namespace ffaCalcualtor
                             break;
                         }
                     }
-                    if(lowestList != null)
+                    if (lowestList != null)
                     {
                         //Console.WriteLine("add");
                         //Console.WriteLine(sumPoints(list));
@@ -445,19 +589,81 @@ namespace ffaCalcualtor
         }
         public static void printLineups()
         {
-            foreach(List<player> list in Lineup)
+            List<player> best = getBestLineups();
+            foreach(List<player> list in bestLineups)
             {
                 Console.WriteLine("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
                 Console.WriteLine("points= " + sumPoints(list));
                 Console.WriteLine("salary= " + sumSalary(list));
                 Console.WriteLine("floor= " + sumFloor(list));
                 Console.WriteLine("Bell= " + sumBell(list));
+                Console.WriteLine("Same= " + findDifPlayers(best, list));
                 foreach (player p in list)
                 {
                     Console.WriteLine("name= " + p.name);
                     Console.WriteLine("salary= " + p.salary);
                 }
             }
+        }
+        public static List<player> getBestLineups()
+        {
+            List<player> best = Lineup[0];
+            foreach(List<player> list in Lineup)
+            {
+                if(sumPoints(list) > sumPoints(best))
+                {
+                    best = list;
+                }
+            }
+            return best;
+        }
+
+        public static void printLineupsThreads()
+        {
+            List<player> best = getBestLineupsThreads();
+            foreach (List<player> list in bestLineups)
+            {
+                Console.WriteLine("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+                Console.WriteLine("points= " + sumPoints(list));
+                Console.WriteLine("salary= " + sumSalary(list));
+                Console.WriteLine("floor= " + sumFloor(list));
+                Console.WriteLine("Bell= " + sumBell(list));
+                Console.WriteLine("Same= " + findDifPlayers(best, list));
+                foreach (player p in list)
+                {
+                    Console.WriteLine("name= " + p.name);
+                    Console.WriteLine("salary= " + p.salary);
+                }
+            }
+        }
+        public static List<player> getBestLineupsThreads()
+        {
+            List<player> best = bestLineups[0];
+            foreach (List<player> list in Lineup)
+            {
+                if (sumPoints(list) > sumPoints(best))
+                {
+                    best = list;
+                }
+            }
+            return best;
+        }
+
+        public static int findDifPlayers(List<player> best, List<player> list)
+        {
+            int same = 0;
+            foreach(player pb in best)
+            {
+                foreach(player pl in list)
+                {
+                    //Console.WriteLine(pb.name + " " + pl.name);
+                    if(pb.name.Equals(pl.name))
+                    {
+                        same++;
+                    }
+                }
+            }
+            return same;
         }
         public static bool compareLists(List<player> list1, List<player> list2)
         {
