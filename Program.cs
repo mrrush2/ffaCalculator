@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Threading;
+using IronWebScraper;
 
 namespace ffaCalcualtor
 {
@@ -22,18 +23,21 @@ namespace ffaCalcualtor
         public static IEnumerable<List<player>> bestLineups2 = new List<List<player>>();
         public static List<List<player>> Lineup = new List<List<player>>();
         public static float points = 0;
-        private static String path = "C:/Users/micha/Downloads/ffa_customrankings2020-3.csv";
-        private static String path2 = "C:/Users/micha/Downloads/FanDuel-NFL-2020-09-27-50210-players-list.csv";
+        //private static String path = "C:/Users/micha/Downloads/ffa_customrankings2020-10.csv";
+		private static String path = "C:/Users/micha/Downloads/projections (1).csv";
+		private static String path2 = "C:/Users/micha/Downloads/FanDuel-NFL-2020-11-15-51632-players-list.csv";
         private static string outputcsv = "C:/Users/micha/Documents/Code/FanduelLineups.csv";
 
         private static List<Thread> threads = new List<Thread>();
         private static List<List<List<player>>> threadLineups = new List<List<List<player>>>();
 
         static void Main(string[] args)
-        {
-            readCSV(path, "\"CLE\"", "\"CIN\"");
+		{ 
+            //var scraper = new WebScraper.
+
+            readCSV(path, "\"IND\"", "\"TEN\"");
             //QB  RB  WR TE DST 
-            setAllPositions(18, 12,11, 8, 9);
+            setAllPositions(18, 12,11, 8, 6);
             //setAllPositionsQb("Eli Manning", 12, 10, 10, 10);
             //setAllPositionsDst(18, 12, 10, 10, "Patriots");
             findBest(rb, bestRB, 40);
@@ -81,9 +85,14 @@ namespace ffaCalcualtor
                                 //Console.WriteLine(left);
                                 values[1] = values[1].Replace(".", "");
                                 values[1] = values[1].Replace("'", "");
-                                data.Add(new player(values[1], values[2], values[3], values[7], values[8], values[9], values[10],
-                                    values[11], values[12], values[13], values[14], values[16], values[17], values[18]));
-                            }
+
+								//"playerId","player","team","position","age","exp","bye","points","lower","upper","sdPts","positionRank","dropoff","tier","ptSpread","overallECR","positionECR","sdRank","risk","sleeper","salary"
+								//0          1        2       3         4      5     6    7        8       9       10      11				12		13		14			15			16				17		18		19		20
+								//data.Add(new player(values[1], values[2], values[3], values[7], values[8], values[9], values[10],
+								//    values[11], values[12], values[13], values[14], values[16], values[17], values[18]));
+								data.Add(new player(values[1], values[2], values[3], values[7], values[8], values[9], values[10],
+									values[11], values[12], "0", "0", "0", "0", "0"));
+							}
 
                         }
                     }
@@ -639,7 +648,7 @@ namespace ffaCalcualtor
         public static List<player> getBestLineupsThreads()
         {
             List<player> best = bestLineups[0];
-            foreach (List<player> list in Lineup)
+            foreach (List<player> list in bestLineups)
             {
                 if (sumPoints(list) > sumPoints(best))
                 {
