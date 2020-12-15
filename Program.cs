@@ -24,8 +24,8 @@ namespace ffaCalcualtor
         public static List<List<player>> Lineup = new List<List<player>>();
         public static float points = 0;
         //private static String path = "C:/Users/micha/Downloads/ffa_customrankings2020-10.csv";
-		private static String path = "C:/Users/micha/Downloads/projections (1).csv";
-		private static String path2 = "C:/Users/micha/Downloads/FanDuel-NFL-2020-11-15-51632-players-list.csv";
+		private static String path = "C:/Users/micha/Downloads/projections (4).csv";
+		private static String path2 = "C:/Users/micha/Downloads/FanDuel-NFL-2020-12-13-52298-players-list.csv";
         private static string outputcsv = "C:/Users/micha/Documents/Code/FanduelLineups.csv";
 
         private static List<Thread> threads = new List<Thread>();
@@ -35,9 +35,10 @@ namespace ffaCalcualtor
 		{ 
             //var scraper = new WebScraper.
 
-            readCSV(path, "\"IND\"", "\"TEN\"");
-            //QB  RB  WR TE DST 
-            setAllPositions(18, 12,11, 8, 6);
+            readCSV(path, "\"LAR\"", "\"NE\"");
+			//readCSV(path);
+			//				QB  RB WR TE  DST 
+			setAllPositions(18, 14,13, 8, 6);
             //setAllPositionsQb("Eli Manning", 12, 10, 10, 10);
             //setAllPositionsDst(18, 12, 10, 10, "Patriots");
             findBest(rb, bestRB, 40);
@@ -59,7 +60,79 @@ namespace ffaCalcualtor
             Console.WriteLine("done");
             Console.ReadKey();
         }
-        public static void readCSV(String path, string team1, string team2)
+
+		public static void readCSV(String path)
+		{
+			using (var reader = new StreamReader(path))
+			{
+				bool first = false;
+				while (!reader.EndOfStream)
+				{
+					var line = reader.ReadLine();
+					var values = line.Split(',');
+					if (first)
+					{
+						float points = 0;
+						float lower = 0;
+						float upper = 0;
+						if (!values[7].Equals("NA")) points = float.Parse(values[7]);
+						if (!values[8].Equals("NA")) lower = float.Parse(values[8]);
+						if (!values[9].Equals("NA")) upper = float.Parse(values[9]);
+						float left = (points - lower) / (upper - points);
+						//Console.WriteLine(points + "  " + lower + "  " + upper + "  " + left);
+						if ((lower < points && upper > points) || values[3].Equals("\"DST\""))
+						{
+							//Console.WriteLine(left);
+							values[1] = values[1].Replace(".", "");
+							values[1] = values[1].Replace("'", "");
+
+							//"playerId","player","team","position","age","exp","bye","points","lower","upper","sdPts","positionRank","dropoff","tier","ptSpread","overallECR","positionECR","sdRank","risk","sleeper","salary"
+							//0          1        2       3         4      5     6    7        8       9       10      11				12		13		14			15			16				17		18		19		20
+							//data.Add(new player(values[1], values[2], values[3], values[7], values[8], values[9], values[10],
+							//    values[11], values[12], values[13], values[14], values[16], values[17], values[18]));
+							data.Add(new player(values[1], values[2], values[3], values[7], values[8], values[9], values[10],
+								values[11], values[12], "0", "0", "0", "0", "0"));
+						}
+					}
+					else first = true;
+				}
+			}
+			using (var reader = new StreamReader(path2))
+			{
+				bool first = false;
+				while (!reader.EndOfStream)
+				{
+					var line = reader.ReadLine();
+					var values = line.Split(',');
+					values[3] = values[3].Replace("'", "");
+					values[3] = values[3].Replace(".", "");
+					//values[3] = values[3].Replace(" Jr", "");
+					//values[3] = values[3].Replace(" IV", "");
+					//values[3] = values[3].Replace(" III", "");
+					//values[3] = values[3].Replace(" II", "");
+					if (first)
+					{
+						foreach (player p in data)
+						{
+							string str = p.name.Replace("\"", "");
+							string pos = p.position.Replace("\"", "");
+							string str2 = values[1].Replace("\"", "");
+							string str3 = values[3].Replace("\"", "");
+							string str4 = values[4].Replace("\"", "");
+							//Console.WriteLine(pos + "   " + str2);
+							if ((str3.Contains(str) && str2.Contains(pos)) || str4.Contains(str))
+							{
+								int salary = int.Parse(values[7].Replace("\"", ""));
+								//Console.WriteLine(str + "   " + str3 + "   " + str4 + "    " + salary);
+								p.setSalary(salary);
+							}
+						}
+					}
+					else first = true;
+				}
+			}
+		}
+		public static void readCSV(String path, string team1, string team2)
         {
             using (var reader = new StreamReader(path))
             {
@@ -119,13 +192,14 @@ namespace ffaCalcualtor
                             string str = p.name.Replace("\"", "");
                             string pos = p.position.Replace("\"", "");
                             string str2 = values[1].Replace("\"", "");
+							if (str2.Equals("D")) str2 = "DST";
                             string str3 = values[3].Replace("\"", "");
                             string str4 = values[4].Replace("\"", "");
                             //Console.WriteLine(pos + "   " + str2);
                             if ((str3.Contains(str) && str2.Contains(pos)) || str4.Contains(str))
                             {
                                 int salary = int.Parse(values[7].Replace("\"", ""));
-                                //Console.WriteLine(str + "   " + str3 + "   " + str4 + "    " + salary);
+                                Console.WriteLine(str + "   " + str3 + "   " + str4 + "    " + salary);
                                 p.setSalary(salary);
                             }
                         }
