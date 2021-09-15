@@ -11,7 +11,7 @@
             if (!lower.Equals("NA")) this.lower = float.Parse(lower);
             if (!upper.Equals("NA")) this.upper = float.Parse(upper);
             if (!sdPts.Equals("NA") && !sdPts.Equals("Inf")) this.sdPts = float.Parse(sdPts);
-            if (!positionRank.Equals("NA")) this.positionRank = int.Parse(positionRank);
+            //if (!positionRank.Equals("NA")) this.positionRank = int.Parse(positionRank);
             if (!dropoff.Equals("NA")) this.dropoff = float.Parse(dropoff);
             if (!tier.Equals("NA")) this.tier = int.Parse(tier);
             if (!ptSpread.Equals("NA")) this.ptSpread = float.Parse(ptSpread);
@@ -19,6 +19,7 @@
             if (!sdRank.Equals("NA")) this.sdRank = float.Parse(sdRank);
             if (!risk.Equals("NA")) this.risk = float.Parse(risk);
             this.salary = 10000;
+			this.risk = 0;
         }
 
         public bool Equals(player p)

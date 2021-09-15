@@ -24,8 +24,8 @@ namespace ffaCalcualtor
         public static List<List<player>> Lineup = new List<List<player>>();
         public static float points = 0;
         //private static String path = "C:/Users/micha/Downloads/ffa_customrankings2020-10.csv";
-		private static String path = "C:/Users/micha/Downloads/projections (4).csv";
-		private static String path2 = "C:/Users/micha/Downloads/FanDuel-NFL-2020-12-13-52298-players-list.csv";
+		private static String path = "C:/Users/micha/Downloads/Week2 - ffa.csv";
+		private static String path2 = "C:/Users/micha/Downloads/FanDuel-NFL-2021 ET-09 ET-19 ET-63955-players-list.csv";
         private static string outputcsv = "C:/Users/micha/Documents/Code/FanduelLineups.csv";
 
         private static List<Thread> threads = new List<Thread>();
@@ -35,22 +35,23 @@ namespace ffaCalcualtor
 		{ 
             //var scraper = new WebScraper.
 
-            readCSV(path, "\"LAR\"", "\"NE\"");
+            readCSV(path, "\"NYG\"", "\"WAS\"", "\"KC\"", "\"BAL\"", "\"DET\"", "\"GB\"");
 			//readCSV(path);
 			//				QB  RB WR TE  DST 
-			setAllPositions(18, 14,13, 8, 6);
-            //setAllPositionsQb("Eli Manning", 12, 10, 10, 10);
-            //setAllPositionsDst(18, 12, 10, 10, "Patriots");
+			setAllPositions(19, 12,10, 10, 6.5);
+			//setAllPositionsQb("Eli Manning", 12, 10, 10, 10);
+			//setAllPositionsDst(18, 12, 10, 10, "Patriots");
+			//Console.WriteLine(rb.Count);
             findBest(rb, bestRB, 40);
             findBest(wr, bestWR, 40);
             //findBest2(rb, bestRB, 30);
             //findBest4(wr, bestWR, 56);
-            Console.WriteLine("RB " +bestRB.Count);
+            Console.WriteLine("RB " + bestRB.Count);
             Console.WriteLine("WR " + bestWR.Count);
             Console.WriteLine("QB " + qb.Count);
             Console.WriteLine("TE " + te.Count);
             Console.WriteLine("DST " + dst.Count);
-            findLineups(130, 42, 100);
+            findLineups(120, 50, 80);
             //findBestLineup(130, 42, 100);
             consolidateThreadRosters(threadLineups);
             Console.WriteLine(bestLineups.Count);
@@ -66,23 +67,27 @@ namespace ffaCalcualtor
 			using (var reader = new StreamReader(path))
 			{
 				bool first = false;
+				int i = 0;
 				while (!reader.EndOfStream)
 				{
 					var line = reader.ReadLine();
 					var values = line.Split(',');
 					if (first)
 					{
+						//Console.WriteLine(values[1]);
 						float points = 0;
 						float lower = 0;
 						float upper = 0;
-						if (!values[7].Equals("NA")) points = float.Parse(values[7]);
-						if (!values[8].Equals("NA")) lower = float.Parse(values[8]);
-						if (!values[9].Equals("NA")) upper = float.Parse(values[9]);
+						//Console.WriteLine(values[4] + " : " + i);
+						if (!values[5].Equals("NA")) points = float.Parse(values[5]);//7
+						if (!values[4].Equals("NA") || values[4] != null) lower = float.Parse(values[4]);//8
+						if (!values[6].Equals("NA") || !values[6].Equals("")) upper = float.Parse(values[6]);//9
 						float left = (points - lower) / (upper - points);
+						i++;
 						//Console.WriteLine(points + "  " + lower + "  " + upper + "  " + left);
 						if ((lower < points && upper > points) || values[3].Equals("\"DST\""))
 						{
-							//Console.WriteLine(left);
+							//Console.WriteLine(values[1]);
 							values[1] = values[1].Replace(".", "");
 							values[1] = values[1].Replace("'", "");
 
@@ -90,8 +95,8 @@ namespace ffaCalcualtor
 							//0          1        2       3         4      5     6    7        8       9       10      11				12		13		14			15			16				17		18		19		20
 							//data.Add(new player(values[1], values[2], values[3], values[7], values[8], values[9], values[10],
 							//    values[11], values[12], values[13], values[14], values[16], values[17], values[18]));
-							data.Add(new player(values[1], values[2], values[3], values[7], values[8], values[9], values[10],
-								values[11], values[12], "0", "0", "0", "0", "0"));
+							data.Add(new player(values[1], values[2], values[3], values[5], values[4], values[6], values[7],
+								values[10], "0", "0", "0", "0", "0", "0"));
 						}
 					}
 					else first = true;
@@ -106,6 +111,7 @@ namespace ffaCalcualtor
 					var values = line.Split(',');
 					values[3] = values[3].Replace("'", "");
 					values[3] = values[3].Replace(".", "");
+					Console.WriteLine(values[3]);
 					//values[3] = values[3].Replace(" Jr", "");
 					//values[3] = values[3].Replace(" IV", "");
 					//values[3] = values[3].Replace(" III", "");
@@ -117,13 +123,14 @@ namespace ffaCalcualtor
 							string str = p.name.Replace("\"", "");
 							string pos = p.position.Replace("\"", "");
 							string str2 = values[1].Replace("\"", "");
+							if (str2.Equals("D")) str2 = "DST";
 							string str3 = values[3].Replace("\"", "");
 							string str4 = values[4].Replace("\"", "");
-							//Console.WriteLine(pos + "   " + str2);
+							Console.WriteLine(pos + "   " + str2);
 							if ((str3.Contains(str) && str2.Contains(pos)) || str4.Contains(str))
 							{
 								int salary = int.Parse(values[7].Replace("\"", ""));
-								//Console.WriteLine(str + "   " + str3 + "   " + str4 + "    " + salary);
+								Console.WriteLine(str + "   " + str3 + "   " + str4 + "    " + salary + "   " + p.points);
 								p.setSalary(salary);
 							}
 						}
@@ -199,7 +206,7 @@ namespace ffaCalcualtor
                             if ((str3.Contains(str) && str2.Contains(pos)) || str4.Contains(str))
                             {
                                 int salary = int.Parse(values[7].Replace("\"", ""));
-                                Console.WriteLine(str + "   " + str3 + "   " + str4 + "    " + salary);
+								//Console.WriteLine(str + "   " + str3 + "   " + str4 + "    " + salary + "   " + p.points);
                                 p.setSalary(salary);
                             }
                         }
@@ -294,11 +301,11 @@ namespace ffaCalcualtor
                             float points = 0;
                             float lower = 0;
                             float upper = 0;
-                            //Console.WriteLine(values[1]);
-                            if (!values[7].Equals("NA")) points = float.Parse(values[7]);
-                            if (!values[8].Equals("NA")) lower = float.Parse(values[8]);
-                            if (!values[9].Equals("NA")) upper = float.Parse(values[9]);
-                            float left = (points - lower) / (upper - points);
+							//Console.WriteLine(values[1]);
+							if (!values[5].Equals("NA")) points = float.Parse(values[5]);//7
+							if (!values[4].Equals("NA") || values[4] != null) lower = float.Parse(values[4]);//8
+							if (!values[6].Equals("NA") || !values[6].Equals("")) upper = float.Parse(values[6]);//9
+							float left = (points - lower) / (upper - points);
                             //Console.WriteLine(points + "  " + lower + "  " + upper + "  " + left);
                             if ((lower < points && upper > points) || values[3].Equals("\"DST\""))
                             {
@@ -306,9 +313,9 @@ namespace ffaCalcualtor
                                 //Console.WriteLine(values[1]);
                                 values[1] = values[1].Replace(".", "");
                                 values[1] = values[1].Replace("'", "");
-                                data.Add(new player(values[1], values[2], values[3], values[7], values[8], values[9], values[10],
-                                    values[11], values[12], values[13], values[14], values[16], values[17], values[18]));
-                            }
+								data.Add(new player(values[1], values[2], values[3], values[5], values[4], values[6], values[7],
+								values[10], "0", "0", "0", "0", "0", "0"));
+							}
 
                         }
                     }
@@ -351,21 +358,98 @@ namespace ffaCalcualtor
             }
         }
 
-        public static void setAllPositions(double qbmin, double rbmin, double wrmin, double temin, double dstmin)
+		public static void readCSV(String path, string team1, string team2, string team3, string team4, string team5, string team6, string team7, string team8)
+		{
+			using (var reader = new StreamReader(path))
+			{
+				bool first = false;
+				while (!reader.EndOfStream)
+				{
+					var line = reader.ReadLine();
+					var values = line.Split(',');
+					if (first)
+					{
+						if (!values[2].Equals(team1) && !values[2].Equals(team2) && !values[2].Equals(team3) && !values[2].Equals(team4) && !values[2].Equals(team5) && !values[2].Equals(team6) && !values[2].Equals(team7) && !values[2].Equals(team8))
+						{
+							float points = 0;
+							float lower = 0;
+							float upper = 0;
+							if (!values[7].Equals("NA")) points = float.Parse(values[7]);
+							if (!values[8].Equals("NA")) lower = float.Parse(values[8]);
+							if (!values[9].Equals("NA")) upper = float.Parse(values[9]);
+							float left = (points - lower) / (upper - points);
+							//Console.WriteLine(points + "  " + lower + "  " + upper + "  " + left);
+							if ((lower < points && upper > points) || values[3].Equals("\"DST\""))
+							{
+								//Console.WriteLine(left);
+								values[1] = values[1].Replace(".", "");
+								values[1] = values[1].Replace("'", "");
+
+								//"playerId","player","team","position","age","exp","bye","points","lower","upper","sdPts","positionRank","dropoff","tier","ptSpread","overallECR","positionECR","sdRank","risk","sleeper","salary"
+								//0          1        2       3         4      5     6    7        8       9       10      11				12		13		14			15			16				17		18		19		20
+								//data.Add(new player(values[1], values[2], values[3], values[7], values[8], values[9], values[10],
+								//    values[11], values[12], values[13], values[14], values[16], values[17], values[18]));
+								data.Add(new player(values[1], values[2], values[3], values[7], values[8], values[9], values[10],
+									values[11], values[12], "0", "0", "0", "0", "0"));
+							}
+
+						}
+					}
+					else first = true;
+				}
+			}
+			using (var reader = new StreamReader(path2))
+			{
+				bool first = false;
+				while (!reader.EndOfStream)
+				{
+					var line = reader.ReadLine();
+					var values = line.Split(',');
+					values[3] = values[3].Replace("'", "");
+					values[3] = values[3].Replace(".", "");
+					//values[3] = values[3].Replace(" Jr", "");
+					//values[3] = values[3].Replace(" IV", "");
+					//values[3] = values[3].Replace(" III", "");
+					//values[3] = values[3].Replace(" II", "");
+					if (first)
+					{
+						foreach (player p in data)
+						{
+							string str = p.name.Replace("\"", "");
+							string pos = p.position.Replace("\"", "");
+							string str2 = values[1].Replace("\"", "");
+							if (str2.Equals("D")) str2 = "DST";
+							string str3 = values[3].Replace("\"", "");
+							string str4 = values[4].Replace("\"", "");
+							//Console.WriteLine(pos + "   " + str2);
+							if ((str3.Contains(str) && str2.Contains(pos)) || str4.Contains(str))
+							{
+								int salary = int.Parse(values[7].Replace("\"", ""));
+								//Console.WriteLine(str + "   " + str3 + "   " + str4 + "    " + salary + "   " + p.points);
+								p.setSalary(salary);
+							}
+						}
+					}
+					else first = true;
+				}
+			}
+		}
+
+		public static void setAllPositions(double qbmin, double rbmin, double wrmin, double temin, double dstmin)
         {
-            setPosition("\"QB\"", qb, qbmin);
-            setPosition("\"RB\"", rb, rbmin);
-            setPosition("\"WR\"", wr, wrmin);
-            setPosition("\"TE\"", te, temin);
-            setPosition("\"DST\"", dst, dstmin);
+            setPosition("QB", qb, qbmin);
+            setPosition("RB", rb, rbmin);//"\"RB\""
+			setPosition("WR", wr, wrmin);
+            setPosition("TE", te, temin);
+            setPosition("DST", dst, dstmin);
         }
 
         public static void setPosition(string str, List<player> l, double min)
         {
             foreach (player p in data)
             {
-                //float value = (p.points / p.salary) * 1000;
-                //Console.WriteLine(value);
+                float value = (p.points / p.salary) * 1000;
+                //Console.WriteLine(p.name + " : " + p.points + " : " + p.salary + " : " +min);
                 //Console.WriteLine(p.name);
                 if (p.position.Equals(str) && p.points > min)
                 {
@@ -388,7 +472,8 @@ namespace ffaCalcualtor
                         best.Add(list.ElementAt(i));
                         best.Add(list.ElementAt(j));
                         best.Add(list.ElementAt(k));
-                        if(sumPoints(best) > min)
+						//Console.WriteLine(list.ElementAt(i).name + "  " + list.ElementAt(j).name + "  " + list.ElementAt(k).name + "  " + sumPoints(best) + "   " + sumSalary(best));
+						if (sumPoints(best) > min)
                         {
                             //Console.WriteLine(list.ElementAt(i).name + "  " + list.ElementAt(j).name + "  " + list.ElementAt(k).name + "  " + sumPoints(best) + "   " + sumSalary(best));
                             temp.Add(best);
@@ -575,12 +660,37 @@ namespace ffaCalcualtor
             {
                 for(int j = 0; j < tRoster.ElementAt(i).Count; j++)
                 {
+					//Console.WriteLine("consolidate");
                     checkRoster(bestLineups, tRoster.ElementAt(i).ElementAt(j));
                 }
             }
+			bubbleSort(bestLineups);
         }
 
-        private static List<player> createLineup(int i, int j, int k, int a, int b, int points, int risk, int floor)
+		static void bubbleSort(List<List<player>> arr)
+		{
+			int n = arr.Count;
+			for (int i = 0; i < n - 1; i++)
+				for (int j = 0; j < n - i - 1; j++)
+					if (sumPoints(arr.ElementAt(j)) > sumPoints(arr.ElementAt(j + 1)))
+					{
+						// swap temp and arr[i]
+						List<player> temp = arr.ElementAt(j);
+						arr[j] = arr.ElementAt(j+1);
+						arr[j + 1] = temp;
+					}
+		}
+
+		/* Prints the array */
+		static void printArray(int[] arr)
+		{
+			int n = arr.Length;
+			for (int i = 0; i < n; ++i)
+				Console.Write(arr[i] + " ");
+			Console.WriteLine();
+		}
+
+		private static List<player> createLineup(int i, int j, int k, int a, int b, int points, int risk, int floor)
         {
             List<player> temp = new List<player>();
             temp.Add(qb.ElementAt(i));
@@ -596,8 +706,9 @@ namespace ffaCalcualtor
             }
             temp.Add(te.ElementAt(a));
             temp.Add(dst.ElementAt(b));
-            //bool twoandfour = (bestRB.ElementAt(j).Count != 3 && bestWR.ElementAt(k).Count != 4) || (bestRB.ElementAt(j).Count != 2 && bestWR.ElementAt(k).Count != 3);
-            if (sumSalary(temp) <= 60000 && sumSalary(temp) > 59000)
+			//Console.WriteLine(sumPoints(temp) + "  " + sumFloor(temp) + "  " + sumRisk(temp) + "  " + sumSalary(temp));
+			//bool twoandfour = (bestRB.ElementAt(j).Count != 3 && bestWR.ElementAt(k).Count != 4) || (bestRB.ElementAt(j).Count != 2 && bestWR.ElementAt(k).Count != 3);
+			if (sumSalary(temp) <= 60000 && sumSalary(temp) > 59000)
             {
                 //Console.WriteLine(sumPoints(temp) + "  " + sumFloor(temp) + "  " + sumRisk(temp) + "  " + sumSalary(temp));
                 if (sumPoints(temp) > points && sumSdPts(temp) < risk && sumFloor(temp) > floor && temp.Count == 9)
@@ -683,8 +794,7 @@ namespace ffaCalcualtor
                 Console.WriteLine("Same= " + findDifPlayers(best, list));
                 foreach (player p in list)
                 {
-                    Console.WriteLine("name= " + p.name);
-                    Console.WriteLine("salary= " + p.salary);
+                    Console.WriteLine(p.name + ":" + p.salary + ":" +p.points);
                 }
             }
         }
@@ -714,9 +824,8 @@ namespace ffaCalcualtor
                 Console.WriteLine("Same= " + findDifPlayers(best, list));
                 foreach (player p in list)
                 {
-                    Console.WriteLine("name= " + p.name);
-                    Console.WriteLine("salary= " + p.salary);
-                }
+					Console.WriteLine(p.name + ":" + p.salary + ":" + p.points);
+				}
             }
         }
         public static List<player> getBestLineupsThreads()
