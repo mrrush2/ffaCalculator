@@ -1,8 +1,8 @@
 ﻿namespace ffaCalcualtor
 {
-    public class player
+    public class playerSingleGame
     {
-        public player(string name, string team, string position, string points, string lower, string upper, string sdPts, string positionRank, string dropoff, string tier, string ptSpread, string positionECR, string sdRank, string risk)
+        public playerSingleGame(string name, string team, string position, string points, string lower, string upper, string sdPts, string positionRank, string dropoff, string tier, string ptSpread, string positionECR, string sdRank, string risk)
         {
             this.name = name;
             this.team = team;
@@ -18,11 +18,33 @@
             if (!positionECR.Equals("NA")) this.positionECR = float.Parse(positionECR);
             if (!sdRank.Equals("NA")) this.sdRank = float.Parse(sdRank);
             if (!risk.Equals("NA")) this.risk = float.Parse(risk);
-            this.salary = 10000;
-			this.risk = 0;
+            this.salary = 20000;
+			this.risk = 10;
+			this.playerID = "";
         }
 
-        public bool Equals(player p)
+		public playerSingleGame(playerSingleGame p)
+		{
+			this.name = p.name;
+			this.team = p.team;
+			this.position = p.position;
+			this.points = p.points;
+			this.lower = p.lower;
+			this.upper = p.upper;
+			this.sdPts = p.sdPts;
+			//if (!positionRank.Equals("NA")) this.positionRank = int.Parse(positionRank);
+			this.dropoff = p.dropoff;
+			this.tier = p.tier;
+			this.ptSpread = p.ptSpread;
+			this.positionECR = p.positionECR;
+			this.sdRank = p.sdRank;
+			this.risk = p.risk;
+			this.salary = p.salary;
+			this.risk = p.risk;
+			this.playerID = p.playerID;
+		}
+
+        public bool Equals(playerSingleGame p)
         {
             if (this.name.Equals(p.name)) return true;
             return false;
@@ -46,7 +68,8 @@
         public float positionECR { get; set; }
         public float sdRank { get; set; }
         public float risk { get; set; }
-        public int salary=10000;
+		public string playerID { get; set; }
+        public int salary=20000;
         public void setSalary(int num) { this.salary = num; }
     }
 

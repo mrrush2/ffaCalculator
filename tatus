@@ -1,0 +1,110 @@
+[1mdiff --git a/Program.cs b/Program.cs[m
+[1mindex 778e54a..77e5183 100644[m
+[1m--- a/Program.cs[m
+[1m+++ b/Program.cs[m
+[36m@@ -24,8 +24,8 @@[m [mnamespace ffaCalcualtor[m
+         public static List<List<player>> Lineup = new List<List<player>>();[m
+         public static float points = 0;[m
+         //private static String path = "C:/Users/micha/Downloads/ffa_customrankings2020-10.csv";[m
+[31m-		private static String path = "C:/Users/micha/Downloads/projections (1).csv";[m
+[31m-		private static String path2 = "C:/Users/micha/Downloads/FanDuel-NFL-2020-11-15-51632-players-list.csv";[m
+[32m+[m		[32mprivate static String path = "C:/Users/micha/Downloads/projections (3).csv";[m
+[32m+[m		[32mprivate static String path2 = "C:/Users/micha/Downloads/FanDuel-NFL-2020-12-13-52298-players-list.csv";[m
+         private static string outputcsv = "C:/Users/micha/Documents/Code/FanduelLineups.csv";[m
+ [m
+         private static List<Thread> threads = new List<Thread>();[m
+[36m@@ -35,9 +35,10 @@[m [mnamespace ffaCalcualtor[m
+ 		{ [m
+             //var scraper = new WebScraper.[m
+ [m
+[31m-            readCSV(path, "\"IND\"", "\"TEN\"");[m
+[31m-            //QB  RB  WR TE DST [m
+[31m-            setAllPositions(18, 12,11, 8, 6);[m
+[32m+[m[32m            readCSV(path, "\"LAR\"", "\"NE\"");[m
+[32m+[m			[32m//readCSV(path);[m
+[32m+[m			[32m//				QB  RB WR TE  DST[m[41m [m
+[32m+[m			[32msetAllPositions(18, 14,13, 8, 6);[m
+             //setAllPositionsQb("Eli Manning", 12, 10, 10, 10);[m
+             //setAllPositionsDst(18, 12, 10, 10, "Patriots");[m
+             findBest(rb, bestRB, 40);[m
+[36m@@ -59,7 +60,79 @@[m [mnamespace ffaCalcualtor[m
+             Console.WriteLine("done");[m
+             Console.ReadKey();[m
+         }[m
+[31m-        public static void readCSV(String path, string team1, string team2)[m
+[32m+[m
+[32m+[m		[32mpublic static void readCSV(String path)[m
+[32m+[m		[32m{[m
+[32m+[m			[32musing (var reader = new StreamReader(path))[m
+[32m+[m			[32m{[m
+[32m+[m				[32mbool first = false;[m
+[32m+[m				[32mwhile (!reader.EndOfStream)[m
+[32m+[m				[32m{[m
+[32m+[m					[32mvar line = reader.ReadLine();[m
+[32m+[m					[32mvar values = line.Split(',');[m
+[32m+[m					[32mif (first)[m
+[32m+[m					[32m{[m
+[32m+[m						[32mfloat points = 0;[m
+[32m+[m						[32mfloat lower = 0;[m
+[32m+[m						[32mfloat upper = 0;[m
+[32m+[m						[32mif (!values[7].Equals("NA")) points = float.Parse(values[7]);[m
+[32m+[m						[32mif (!values[8].Equals("NA")) lower = float.Parse(values[8]);[m
+[32m+[m						[32mif (!values[9].Equals("NA")) upper = float.Parse(values[9]);[m
+[32m+[m						[32mfloat left = (points - lower) / (upper - points);[m
+[32m+[m						[32m//Console.WriteLine(points + "  " + lower + "  " + upper + "  " + left);[m
+[32m+[m						[32mif ((lower < points && upper > points) || values[3].Equals("\"DST\""))[m
+[32m+[m						[32m{[m
+[32m+[m							[32m//Console.WriteLine(left);[m
+[32m+[m							[32mvalues[1] = values[1].Replace(".", "");[m
+[32m+[m							[32mvalues[1] = values[1].Replace("'", "");[m
+[32m+[m
+[32m+[m							[32m//"playerId","player","team","position","age","exp","bye","points","lower","upper","sdPts","positionRank","dropoff","tier","ptSpread","overallECR","positionECR","sdRank","risk","sleeper","salary"[m
+[32m+[m							[32m//0          1        2       3         4      5     6    7        8       9       10      11				12		13		14			15			16				17		18		19		20[m
+[32m+[m							[32m//data.Add(new player(values[1], values[2], values[3], values[7], values[8], values[9], values[10],[m
+[32m+[m							[32m//    values[11], values[12], values[13], values[14], values[16], values[17], values[18]));[m
+[32m+[m							[32mdata.Add(new player(values[1], values[2], values[3], values[7], values[8], values[9], values[10],[m
+[32m+[m								[32mvalues[11], values[12], "0", "0", "0", "0", "0"));[m
+[32m+[m						[32m}[m
+[32m+[m					[32m}[m
+[32m+[m					[32melse first = true;[m
+[32m+[m				[32m}[m
+[32m+[m			[32m}[m
+[32m+[m			[32musing (var reader = new StreamReader(path2))[m
+[32m+[m			[32m{[m
+[32m+[m				[32mbool first = false;[m
+[32m+[m				[32mwhile (!reader.EndOfStream)[m
+[32m+[m				[32m{[m
+[32m+[m					[32mvar line = reader.ReadLine();[m
+[32m+[m					[32mvar values = line.Split(',');[m
+[32m+[m					[32mvalues[3] = values[3].Replace("'", "");[m
+[32m+[m					[32mvalues[3] = values[3].Replace(".", "");[m
+[32m+[m					[32m//values[3] = values[3].Replace(" Jr", "");[m
+[32m+[m					[32m//values[3] = values[3].Replace(" IV", "");[m
+[32m+[m					[32m//values[3] = values[3].Replace(" III", "");[m
+[32m+[m					[32m//values[3] = values[3].Replace(" II", "");[m
+[32m+[m					[32mif (first)[m
+[32m+[m					[32m{[m
+[32m+[m						[32mforeach (player p in data)[m
+[32m+[m						[32m{[m
+[32m+[m							[32mstring str = p.name.Replace("\"", "");[m
+[32m+[m							[32mstring pos = p.position.Replace("\"", "");[m
+[32m+[m							[32mstring str2 = values[1].Replace("\"", "");[m
+[32m+[m							[32mstring str3 = values[3].Replace("\"", "");[m
+[32m+[m							[32mstring str4 = values[4].Replace("\"", "");[m
+[32m+[m							[32m//Console.WriteLine(pos + "   " + str2);[m
+[32m+[m							[32mif ((str3.Contains(str) && str2.Contains(pos)) || str4.Contains(str))[m
+[32m+[m							[32m{[m
+[32m+[m								[32mint salary = int.Parse(values[7].Replace("\"", ""));[m
+[32m+[m								[32m//Console.WriteLine(str + "   " + str3 + "   " + str4 + "    " + salary);[m
+[32m+[m								[32mp.setSalary(salary);[m
+[32m+[m							[32m}[m
+[32m+[m						[32m}[m
+[32m+[m					[32m}[m
+[32m+[m					[32melse first = true;[m
+[32m+[m				[32m}[m
+[32m+[m			[32m}[m
+[32m+[m		[32m}[m
+[32m+[m		[32mpublic static void readCSV(String path, string team1, string team2)[m
+         {[m
+             using (var reader = new StreamReader(path))[m
+             {[m
