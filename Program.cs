@@ -23,22 +23,25 @@ namespace ffaCalcualtor
         public static IEnumerable<List<player>> bestLineups2 = new List<List<player>>();
         public static List<List<player>> Lineup = new List<List<player>>();
         public static float points = 0;
-        //private static String path = "C:/Users/micha/Downloads/ffa_customrankings2020-10.csv";
-		private static String path = "C:/Users/micha/Downloads/Week4 - ffa (1).csv";
-		private static String path2 = "C:/Users/micha/Downloads/FanDuel-NFL-2021 ET-10 ET-03 ET-64596-players-list.csv";
-        private static string outputcsv = "C:/Users/micha/Documents/Code/FanduelLineups.csv";
+		public static int numTeams = 150;
+		public static float usageRate = .33f;
+		//private static String path = "C:/Users/micha/Downloads/ffa_customrankings2020-10.csv";
+		private static String fdName = "Week5 - ffa";
+		private static String path = "C:/Users/micha/Downloads/" + fdName + ".csv";
+		private static String path2 = "C:/Users/micha/Downloads/FanDuel-NFL-2021 ET-10 ET-10 ET-64897-players-list.csv";
+		private static string outputcsv = "C://Users/Micha/OneDrive/Documents/FantasyFootball/" + fdName + ".csv";
 
-        private static List<Thread> threads = new List<Thread>();
+		private static List<Thread> threads = new List<Thread>();
         private static List<List<List<player>>> threadLineups = new List<List<List<player>>>();
 
         static void Main(string[] args)
 		{ 
             //var scraper = new WebScraper.
 
-            readCSV(path, "JAC", "CIN", "TBB", "NEP", "LVR", "LAC");
+            readCSV(path, "SEA", "LAR", "NYJ", "ATL", "BUF", "KC", "IND", "BAL");
 			//readCSV(path);
 			//				QB  RB WR TE  DST 
-			setAllPositions(18.5, 11,10, 10, 5.5);
+			setAllPositions(18.5, 11,10, 9, 6.5);
 			//setAllPositionsQb("Eli Manning", 12, 10, 10, 10);
 			//setAllPositionsDst(18, 12, 10, 10, "Patriots");
 			//Console.WriteLine(rb.Count);
@@ -51,8 +54,7 @@ namespace ffaCalcualtor
             Console.WriteLine("QB " + qb.Count);
             Console.WriteLine("TE " + te.Count);
             Console.WriteLine("DST " + dst.Count);
-            findLineups(110, 60, 80);
-            //findBestLineup(130, 42, 100);
+            findLineups(120, 50, 90);
             consolidateThreadRosters(threadLineups);
             Console.WriteLine(bestLineups.Count);
             printLineupsThreads();
@@ -145,6 +147,7 @@ namespace ffaCalcualtor
 						{
 							string str = p.name.Replace("\"", "");
 							string pos = p.position.Replace("\"", "");
+							string str1 = values[0].Replace("\"", "");
 							string str2 = values[1].Replace("\"", "");
 							if (str2.Equals("D")) str2 = "DST";
 							string str3 = values[3].Replace("\"", "");
@@ -154,6 +157,7 @@ namespace ffaCalcualtor
 							{
 								int salary = int.Parse(values[7].Replace("\"", ""));
 								//Console.WriteLine(str3 + "    " + salary);
+								p.playerID = str1;
 								p.setSalary(salary);
 							}
 						}
@@ -210,72 +214,7 @@ namespace ffaCalcualtor
                 }
             }
         }
-        public static void findBest2(List<player> list, List<List<player>> temp, float min)
-        {
 
-            for (int i = 0; i < list.Count; i++)
-            {
-                for (int j = i + 1; j < list.Count; j++)
-                {
-                    List<player> best = new List<player>();
-                    best.Add(list.ElementAt(i));
-                    best.Add(list.ElementAt(j));
-                    if (sumPoints(best) > min)
-                    {
-                        //Console.WriteLine(list.ElementAt(i).name + "  " + list.ElementAt(j).name + "  " + list.ElementAt(k).name + "  " + sumPoints(best) + "   " + sumSalary(best));
-                        temp.Add(best);
-                    }
-                }
-            }
-        }
-        public static void findBest4(List<player> list, List<List<player>> temp, float min)
-        {
-
-            for (int i = 0; i < list.Count; i++)
-            {
-                for (int j = i + 1; j < list.Count; j++)
-                {
-                    for (int k = j + 1; k < list.Count; k++)
-                    {
-                        for (int a = k + 1; a < list.Count; a++)
-                        {
-                            List<player> best = new List<player>();
-                            best.Add(list.ElementAt(i));
-                            best.Add(list.ElementAt(j));
-                            best.Add(list.ElementAt(k));
-                            best.Add(list.ElementAt(a)) ;
-                            if (sumPoints(best) > min)
-                            {
-                                //Console.WriteLine(list.ElementAt(i).name + "  " + list.ElementAt(j).name + "  " + list.ElementAt(k).name + "  " + sumPoints(best) + "   " + sumSalary(best));
-                                temp.Add(best);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        public static void findBestLineup(int points, int risk, int floor)
-        {
-
-            for (int i = 0; i < qb.Count; i++)
-            {
-                Console.WriteLine(i);
-                for (int j = 0; j < bestRB.Count; j++)
-                {
-                    for (int k = 0; k < bestWR.Count; k++)
-                    {
-                        for(int a = 0; a < te.Count; a++)
-                        {
-                            for(int b = 0; b < dst.Count; b++)
-                            {
-                                addTeamToLineup(i, j , k, a, b, points, risk, floor);
-                            }
-                        }
-                    }
-                }
-            }
-            removeLineups();
-        }
         public static void findLineups(int points, int risk, int floor)
         {
             for (int i = 0; i < qb.Count; i++)
@@ -322,7 +261,7 @@ namespace ffaCalcualtor
                             if(temp != null)
                             {
 								//Console.WriteLine("temp not null" + sumPoints(temp));
-								if (roster.Count < 10)
+								if (roster.Count < numTeams * usageRate)
                                 {
                                     //Console.WriteLine("add roster");
                                     roster.Add(temp);
@@ -346,6 +285,27 @@ namespace ffaCalcualtor
                 //t.Join();
             }
         }
+	//	private static bool checkOtherUsage(List<player> team, List<List<player>> roster)
+	//	{
+	//		if (roster.Count < numTeams * usageRate * .5) return true;
+	//		int num = 0;
+	//		for (int i = 0; i < roster.Count; i++)
+	//		{
+	//			for (int j = 0; j < )
+	//		}
+	//	}
+	//
+	//	private static bool checkPlayers(List<player> a, List<player> b)
+	//	{
+	//		string[] pName = new string[] { };
+	//		for (int i = 0; i < a.Count; i++)
+	//		{
+	//			for (int j = 0; j < b.Count; j++)
+	//			{
+	//				if
+	//			}
+	//		}
+	//	}
 
         public static void checkRoster(List<List<player>> roster, List<player> newRoster)
         {
@@ -390,7 +350,8 @@ namespace ffaCalcualtor
                 for(int j = 0; j < tRoster.ElementAt(i).Count; j++)
                 {
 					//Console.WriteLine("consolidate");
-                    checkRoster(bestLineups, tRoster.ElementAt(i).ElementAt(j));
+					if (bestLineups.Count < numTeams) bestLineups.Add(tRoster.ElementAt(i).ElementAt(j));
+                    else checkRoster(bestLineups, tRoster.ElementAt(i).ElementAt(j));
                 }
             }
 			bubbleSort(bestLineups);
@@ -543,7 +504,8 @@ namespace ffaCalcualtor
         public static void printLineupsThreads()
         {
             List<player> best = getBestLineupsThreads();
-            foreach (List<player> list in bestLineups)
+			string csv = "QB,RB,RB,WR,WR,WR,TE,FLEX,DEF" + System.Environment.NewLine;
+			foreach (List<player> list in bestLineups)
             {
                 Console.WriteLine("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
                 Console.WriteLine("points= " + sumPoints(list));
@@ -551,12 +513,31 @@ namespace ffaCalcualtor
                 Console.WriteLine("floor= " + sumFloor(list));
                 Console.WriteLine("Bell= " + sumBell(list));
                 Console.WriteLine("Same= " + findDifPlayers(best, list));
-                foreach (player p in list)
-                {
-					Console.WriteLine(p.name + ":" + p.salary + ":" + p.points);
+				string csvLineup = "";
+				int c = 0;
+				foreach (player p in list)
+				{
+					if (c != 3) 
+					{
+						csvLineup += p.playerID + ":" + p.name + ",";
+						Console.WriteLine(p.name + ":" + p.salary + ":" + p.points);
+					} 
+					if (c == 7)
+					{
+						player pl1 = list.ElementAt(3);
+						csvLineup += pl1.playerID + ":" + pl1.name + ",";
+						Console.WriteLine(pl1.name + ":" + pl1.salary + ":" + pl1.points);
+					}
+					c++;
 				}
-            }
-        }
+				csv += csvLineup + System.Environment.NewLine;
+			}
+			Console.WriteLine(csv);
+			using (StreamWriter writer = new StreamWriter(outputcsv))
+			{
+				writer.WriteLine(csv);
+			}
+		}
         public static List<player> getBestLineupsThreads()
         {
             List<player> best = bestLineups[0];
