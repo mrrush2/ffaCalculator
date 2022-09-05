@@ -22,7 +22,7 @@ namespace ffaCalcualtor
 		public static float mvpUsageRate = .33333f;
 		public static float kickerUsageRate = .2f;
 		//private static String path = "C:/Users/micha/Downloads/ffa_customrankings2020-10.csv";
-		private static String fdName = "Week1 Thursday - ffa";
+		private static String fdName = "Week1 Thursday - ffa (1)";
 		private static String path = "C:/Users/micha/Downloads/" + fdName + ".csv";
 		private static String path2 = "C:/Users/micha/Downloads/FanDuel-NFL-2022 ET-09 ET-08 ET-79000-players-list.csv";
 		private static string outputcsv = "C://Users/Micha/OneDrive/Documents/Fantasy/Football/" + fdName + ".csv";
@@ -31,7 +31,7 @@ namespace ffaCalcualtor
 
 		static void Main(string[] args)
 		{
-			readCSV();
+			readCSV("BUF", "LAR");
 			findBestLineup(50, 30, 40);
 			bubbleSortMvpTeams();
 			getMvpTeamsUsage();
@@ -42,7 +42,7 @@ namespace ffaCalcualtor
 			Console.ReadKey();
 		}
 
-		public static void readCSV()
+		public static void readCSV(String team1, String team2)
 		{
 			using (var reader = new StreamReader(path))
 			{
@@ -61,7 +61,7 @@ namespace ffaCalcualtor
 						if (!values[8].Equals("NA") || !values[6].Equals("")) upper = float.Parse(values[8]);//9
 						//float left = (points - lower) / (upper - points);
 						//Console.WriteLine(values[1] + " " + values[2] + " " + points + "  " + lower + "  " + upper );
-						if ((lower < points && upper > points))
+						if ((lower < points && upper > points) && (values[3].Equals(team1) || values[3].Equals(team2)))
 						{
 							Console.WriteLine(values[1]);
 							values[1] = values[1].Replace(".", "");
