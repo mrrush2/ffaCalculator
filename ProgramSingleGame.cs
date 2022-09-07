@@ -32,7 +32,7 @@ namespace ffaCalcualtor
 		static void Main(string[] args)
 		{
 			readCSV("BUF", "LAR");
-			findBestLineup(50, 30, 40);
+			findBestLineup(50, 250, 40);
 			bubbleSortMvpTeams();
 			getMvpTeamsUsage();
 			bubbleSort(bestLineups);
@@ -63,7 +63,7 @@ namespace ffaCalcualtor
 						//Console.WriteLine(values[1] + " " + values[2] + " " + points + "  " + lower + "  " + upper );
 						if ((lower < points && upper > points) && (values[3].Equals(team1) || values[3].Equals(team2)))
 						{
-							Console.WriteLine(values[1]);
+							//Console.WriteLine(values[19]);
 							values[1] = values[1].Replace(".", "");
 							values[1] = values[1].Replace("'", "");
 							//old
@@ -115,8 +115,9 @@ namespace ffaCalcualtor
 							if ((str3.Contains(str) && str2.Contains(pos)) || str4.Contains(str))
 							{
 								int salary = int.Parse(values[7].Replace("\"", ""));
-								Console.WriteLine(str + "   " + str3 + "   " + str4 + "    " + salary + "   " + p.points);
+								//Console.WriteLine(str + "   " + str3 + "   " + str4 + "    " + salary + "   " + p.points);
 								p.playerID = str1;
+								//Console.WriteLine(p.name + " " + p.risk);
 								p.setSalary(salary);
 							}
 						}
@@ -169,7 +170,7 @@ namespace ffaCalcualtor
 						{
 							for (int b = a+1; b < data.Count; b++)
 							{
-								Console.WriteLine(mvp.ElementAt(i).name + " " + data.ElementAt(j).name + " " + data.ElementAt(c).name + " " + data.ElementAt(a).name + " " + data.ElementAt(b).name);
+								//Console.WriteLine(mvp.ElementAt(i).name + " " + data.ElementAt(j).name + " " + data.ElementAt(c).name + " " + data.ElementAt(a).name + " " + data.ElementAt(b).name);
 								addTeamToLineup(i, j, c, a, b, points, risk, floor);
 							}
 						}
@@ -292,7 +293,7 @@ namespace ffaCalcualtor
 			if (sumSalary(temp) <= 60000 && sumSalary(temp) > 55000 && !checkMvpDup(i,j,d,a,b))
 			{
 				//Console.WriteLine(sumPoints(temp) + "  " + sumFloor(temp) + "  " + sumRisk(temp) + "  " + sumSalary(temp));
-				if (sumPoints(temp) > points && sumSdPts(temp) < risk && sumFloor(temp) > floor && temp.Count == 5 && dupPlayer(temp) && !checkSameTeam(temp))
+				if (sumPoints(temp) > points && sumRisk(temp) < risk && sumFloor(temp) > floor && temp.Count == 5 && dupPlayer(temp) && !checkSameTeam(temp))
 				{
 					//Console.WriteLine(sumPoints(temp));
 					mvpUsage[i] = mvpUsage.ElementAt(i) + 1;
@@ -417,6 +418,7 @@ namespace ffaCalcualtor
 				Console.WriteLine("salary= " + sumSalary(list));
 				Console.WriteLine("floor= " + sumFloor(list));
 				Console.WriteLine("Same= " + findDifPlayers(best, list));
+				Console.WriteLine("risk= " + sumRisk(list));
 				string csvLineup = "";
 				foreach (playerSingleGame p in list)
 				{
@@ -525,6 +527,7 @@ namespace ffaCalcualtor
 			float sum = 0;
 			foreach (playerSingleGame p in list)
 			{
+				//Console.WriteLine(p.risk);
 				sum += p.risk;
 			}
 			return sum;
