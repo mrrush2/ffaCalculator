@@ -18,8 +18,7 @@
 			if (!positionECR.Equals("NA")) this.positionECR = float.Parse(positionECR);
 			if (!sdRank.Equals("NA")) this.sdRank = float.Parse(sdRank);
 			if (!risk.Equals("NA")) this.risk = float.Parse(risk);
-			this.salary = 20000;
-			this.risk = 10;
+			this.salary = 200000;
 			this.playerID = "";
 		}
 
