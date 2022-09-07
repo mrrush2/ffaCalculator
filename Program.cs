@@ -24,12 +24,12 @@ namespace ffaCalcualtor
         public static List<List<player>> Lineup = new List<List<player>>();
         public static float points = 0;
 		public static int numTeams = 150;
-		public static float usageRate = .33f;
+		public static float usageRate = .3f;
 		//private static String path = "C:/Users/micha/Downloads/ffa_customrankings2020-10.csv";
-		private static String fdName = "Week5 - ffa";
+		private static String fdName = "Week17 - ffa (1)";
 		private static String path = "C:/Users/micha/Downloads/" + fdName + ".csv";
-		private static String path2 = "C:/Users/micha/Downloads/FanDuel-NFL-2021 ET-10 ET-10 ET-64897-players-list.csv";
-		private static string outputcsv = "C://Users/Micha/OneDrive/Documents/FantasyFootball/" + fdName + ".csv";
+		private static String path2 = "C:/Users/micha/Downloads/FanDuel-NFL-2022 ET-01 ET-02 ET-69306-players-list.csv";
+		private static string outputcsv = "C://Users/Micha/OneDrive/Documents/Fantasy/Football/" + fdName + ".csv";
 
 		private static List<Thread> threads = new List<Thread>();
         private static List<List<List<player>>> threadLineups = new List<List<List<player>>>();
@@ -38,10 +38,10 @@ namespace ffaCalcualtor
 		{ 
             //var scraper = new WebScraper.
 
-            readCSV(path, "SEA", "LAR", "NYJ", "ATL", "BUF", "KC", "IND", "BAL");
+            readCSV(path, "MIN", "GB", "CLE", "PIT");
 			//readCSV(path);
 			//				QB  RB WR TE  DST 
-			setAllPositions(18.5, 11,10, 9, 6.5);
+			setAllPositions(18, 10,10, 8, 6);
 			//setAllPositionsQb("Eli Manning", 12, 10, 10, 10);
 			//setAllPositionsDst(18, 12, 10, 10, "Patriots");
 			//Console.WriteLine(rb.Count);
@@ -66,15 +66,15 @@ namespace ffaCalcualtor
 
 		public static void readCSV(String path)
 		{
-			readCSV(path, null, null, null, null, null, null, null, null);
+			readCSV(path, null, null);
 		}
 		public static void readCSV(String path, string team1, string team2)
         {
-			readCSV(path, team1, team2, null, null, null, null, null, null);
+			readCSV(path, team1, team2, null, null);
 		}
         public static void readCSV(String path, string team1, string team2, string team3, string team4)
         {
-			readCSV(path, team1, team2, team3, team4, null, null, null, null);
+			readCSV(path, team1, team2, team3, team4, null, null);
 		}
         public static void readCSV(String path, string team1, string team2, string team3, string team4, string team5, string team6)
         {
@@ -83,11 +83,16 @@ namespace ffaCalcualtor
 
 		public static void readCSV(String path, string team1, string team2, string team3, string team4, string team5, string team6, string team7, string team8)
 		{
-			readFFA(path, team1, team2, team3, team4, team5, team6, team7, team8);
+			readCSV(path, team1, team2, team3, team4, team5, team6, team7, team8, null, null);
+		}
+
+		public static void readCSV(String path, string team1, string team2, string team3, string team4, string team5, string team6, string team7, string team8, string team9, string team10)
+		{
+			readFFA(path, team1, team2, team3, team4, team5, team6, team7, team8, team9, team10);
 			readFD();
 		}
 
-		private static void readFFA(String path, string team1, string team2, string team3, string team4, string team5, string team6, string team7, string team8)
+		private static void readFFA(String path, string team1, string team2, string team3, string team4, string team5, string team6, string team7, string team8, string team9, string team10)
 		{
 			using (var reader = new StreamReader(path))
 			{
@@ -98,7 +103,7 @@ namespace ffaCalcualtor
 					var values = line.Split(',');
 					if (first)
 					{
-						if (!values[2].Equals(team1) && !values[2].Equals(team2) && !values[2].Equals(team3) && !values[2].Equals(team4) && !values[2].Equals(team5) && !values[2].Equals(team6) && !values[2].Equals(team7) && !values[2].Equals(team8))
+						if (!values[2].Equals(team1) && !values[2].Equals(team2) && !values[2].Equals(team3) && !values[2].Equals(team4) && !values[2].Equals(team5) && !values[2].Equals(team6) && !values[2].Equals(team7) && !values[2].Equals(team8) && !values[2].Equals(team9) && !values[2].Equals(team10))
 						{
 							float points = 0;
 							float lower = 0;
@@ -108,7 +113,7 @@ namespace ffaCalcualtor
 							if (!values[4].Equals("NA") || values[4] != null) lower = float.Parse(values[4]);//8
 							if (!values[6].Equals("NA") || !values[6].Equals("")) upper = float.Parse(values[6]);//9
 							float left = (points - lower) / (upper - points);
-							//Console.WriteLine(values[1] + " " + points + "  " + lower + "  " + upper + "  " + left);
+							Console.WriteLine(values[1] + " " + points + "  " + lower + "  " + upper + "  " + left);
 							if ((lower < points && upper > points) || values[3].Equals("\"DST\""))
 							{
 								//Console.WriteLine(left);
@@ -401,7 +406,7 @@ namespace ffaCalcualtor
 			if (sumSalary(temp) <= 60000 && sumSalary(temp) > 59000)
             {
                 //Console.WriteLine(sumPoints(temp) + "  " + sumFloor(temp) + "  " + sumRisk(temp) + "  " + sumSalary(temp));
-                if (sumPoints(temp) > points && sumFloor(temp) > floor && temp.Count == 9)
+                if (sumPoints(temp) > points && sumFloor(temp) > floor && temp.Count == 9 && checkTeams(temp))
                 {
                     return (temp);
                 }
@@ -409,7 +414,37 @@ namespace ffaCalcualtor
             return null;
         }
 
-        private static void addTeamToLineup(int i, int j, int k, int a, int b, int points, int risk, int floor)
+		private static bool checkTeams(List<player> players)
+		{
+			List<string> teamName = new List<string>();
+			List<int> teamCount = new List<int>();
+			foreach (player p in players)
+			{
+				if (teamName.Contains(p.team))
+				{
+					int index = teamName.IndexOf(p.team);
+					//Console.WriteLine(teamName[index] + " " + p.team);
+					//Console.WriteLine(teamCount[index]);
+					teamCount[index] += 1;
+				}
+				else
+				{
+					teamName.Add(p.team);
+					teamCount.Add(1);
+				}
+			}
+			foreach (int i in teamCount)
+			{
+				//Console.WriteLine(i);
+				if (i > 4)
+				{
+					return false;
+				}
+			}
+			return true;
+		}
+
+		private static void addTeamToLineup(int i, int j, int k, int a, int b, int points, int risk, int floor)
         {
             List<player> temp = new List<player>();
             temp.Add(qb.ElementAt(i));
