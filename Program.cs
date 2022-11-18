@@ -26,10 +26,10 @@ namespace ffaCalcualtor
 		public static int numTeams = 150;
 		public static float usageRate = .3f;
 		//private static String path = "C:/Users/micha/Downloads/ffa_customrankings2020-10.csv";
-		private static String fdName = "Week1 - ffa (2)";
+		private static String fdName = "Week10 - ffa (2)";
 		private static String path = "C:/Users/micha/Downloads/" + fdName + ".csv";
-		private static String path2 = "C:/Users/micha/Downloads/FanDuel-NFL-2022 ET-09 ET-11 ET-78867-players-list (1).csv";
-		private static string outputcsv = "C://Users/Micha/OneDrive/Documents/Fantasy/Football/" + fdName + ".csv";
+		private static String path2 = "C:/Users/micha/Downloads/FanDuel-NFL-2022 ET-11 ET-13 ET-82959-players-list.csv";
+		private static string outputcsv = "C://Users/Micha/OneDrive/Documents/Fantasy/Football/week3/lineups/" + fdName + ".csv";
 
 		private static List<Thread> threads = new List<Thread>();
         private static List<List<List<player>>> threadLineups = new List<List<List<player>>>();
@@ -38,10 +38,10 @@ namespace ffaCalcualtor
 		{ 
             //var scraper = new WebScraper.
 
-            readCSV(path, "BUF", "LAR", "TB", "DAL", "DEN", "SEA");
+            readCSV(path, "ATL", "CAR", "SEA", "TB", "LAC", "SF", "WAS", "PHI");
 			//readCSV(path);
 			//				QB  RB WR TE  DST 
-			setAllPositions(18, 10,10, 8, 6);
+			setAllPositions(17, 10,10, 8, 5);
 			//setAllPositionsQb("Eli Manning", 12, 10, 10, 10);
 			//setAllPositionsDst(18, 12, 10, 10, "Patriots");
 			//Console.WriteLine(rb.Count);
@@ -54,7 +54,7 @@ namespace ffaCalcualtor
             Console.WriteLine("QB " + qb.Count);
             Console.WriteLine("TE " + te.Count);
             Console.WriteLine("DST " + dst.Count);
-            findLineups(110, 550, 90);
+            findLineups(110, 600, 90);
             consolidateThreadRosters(threadLineups);
             Console.WriteLine(bestLineups.Count);
             printLineupsThreads();
@@ -113,7 +113,7 @@ namespace ffaCalcualtor
 							if (!values[7].Equals("NA") || values[7] != null) lower = float.Parse(values[7]);//8
 							if (!values[8].Equals("NA") || !values[8].Equals("")) upper = float.Parse(values[8]);//9
 							float left = (points - lower) / (upper - points);
-							Console.WriteLine(values[1] + " " + points + "  " + lower + "  " + upper + "  " + left);
+							//Console.WriteLine(values[1] + " " + points + "  " + lower + "  " + upper + "  " + left);
 							if ((lower < points && upper > points) || values[3].Equals("\"DST\""))
 							{
 								//Console.WriteLine(left);
@@ -265,7 +265,7 @@ namespace ffaCalcualtor
                             //Console.WriteLine(" j = " + j + " k = " + k + " a = " + a + " b = " + b);
                             if(temp != null)
                             {
-								Console.WriteLine("temp not null" + sumPoints(temp));
+								//Console.WriteLine("temp not null" + sumPoints(temp));
 								if (roster.Count < numTeams * usageRate)
                                 {
                                     //Console.WriteLine("add roster");
@@ -405,8 +405,8 @@ namespace ffaCalcualtor
 			//bool twoandfour = (bestRB.ElementAt(j).Count != 3 && bestWR.ElementAt(k).Count != 4) || (bestRB.ElementAt(j).Count != 2 && bestWR.ElementAt(k).Count != 3);
 			if (sumSalary(temp) <= 60000 && sumSalary(temp) > 59000)
             {
-                Console.WriteLine(sumPoints(temp) + "  " + sumFloor(temp) + "  " + sumRisk(temp) + "  " + sumSalary(temp));
-                if (sumPoints(temp) > points && sumFloor(temp) > floor && temp.Count == 9 && checkTeams(temp))
+                //Console.WriteLine(sumPoints(temp) + "  " + sumFloor(temp) + "  " + sumRisk(temp) + "  " + sumSalary(temp));
+                if (sumPoints(temp) > points && sumFloor(temp) > floor && temp.Count == 9 && checkTeams(temp) && sumRisk(temp) < risk)
                 {
                     return (temp);
                 }
