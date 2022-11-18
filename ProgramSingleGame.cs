@@ -20,19 +20,19 @@ namespace ffaCalcualtor
 		public static float points = 0;
 		public static int numTeams = 150;
 		public static float mvpUsageRate = .33333f;
-		public static float kickerUsageRate = .2f;
+		public static float kickerUsageRate = .3f;
 		//private static String path = "C:/Users/micha/Downloads/ffa_customrankings2020-10.csv";
-		private static String fdName = "Week1 Thursday - ffa (1)";
+		private static String fdName = "Week8 Thursday - ffa (1)";
 		private static String path = "C:/Users/micha/Downloads/" + fdName + ".csv";
-		private static String path2 = "C:/Users/micha/Downloads/FanDuel-NFL-2022 ET-09 ET-08 ET-79000-players-list.csv";
-		private static string outputcsv = "C://Users/Micha/OneDrive/Documents/Fantasy/Football/" + fdName + ".csv";
+		private static String path2 = "C:/Users/micha/Downloads/FanDuel-NFL-2022 ET-10 ET-27 ET-82293-players-list.csv";
+		private static string outputcsv = "C://Users/Micha/OneDrive/Documents/Fantasy/Football/week3/lineups/" + fdName + ".csv";
 		private static List<Thread> threads = new List<Thread>();
 		private static List<List<List<playerSingleGame>>> mvpTeams = new List<List<List<playerSingleGame>>>();
 
 		static void Main(string[] args)
 		{
-			readCSV("BUF", "LAR");
-			findBestLineup(50, 250, 40);
+			readCSV("TB", "BAL");
+			findBestLineup(50, 400, 40);
 			bubbleSortMvpTeams();
 			getMvpTeamsUsage();
 			bubbleSort(bestLineups);
@@ -59,9 +59,9 @@ namespace ffaCalcualtor
 						if (!values[4].Equals("NA")) points = float.Parse(values[4]);//7
 						if (!values[7].Equals("NA") || values[4] != null) lower = float.Parse(values[7]);//8
 						if (!values[8].Equals("NA") || !values[6].Equals("")) upper = float.Parse(values[8]);//9
-						//float left = (points - lower) / (upper - points);
-						//Console.WriteLine(values[1] + " " + values[2] + " " + points + "  " + lower + "  " + upper );
-						if ((lower < points && upper > points) && (values[3].Equals(team1) || values[3].Equals(team2)))
+																											 //float left = (points - lower) / (upper - points);
+																											//Console.WriteLine(values[1] + " " + values[2] + " " + points + "  " + lower + "  " + upper );
+						if ((lower < points && upper > points && points > 3) && (values[3].Equals(team1) || values[3].Equals(team2)))
 						{
 							//Console.WriteLine(values[19]);
 							values[1] = values[1].Replace(".", "");
@@ -69,19 +69,21 @@ namespace ffaCalcualtor
 							//old
 							//"playerId","player","team","position","age","exp","bye","points","lower","upper","sdPts","positionRank","dropoff","tier","ptSpread","overallECR","positionECR","sdRank","risk","sleeper","salary"
 							//0          1        2       3         4      5     6    7        8       9       10      11				12		13		14			15			16				17		18		19		20
-							
+
 							//new
 							//"playerId","player","position","team","points","sdPts","dropoff","lower","upper","vor","vor_lower","vor_upper","rank","lower_rank","upper_rank","position_rank","tier","adp","aav","risk"
 							//0          1          2          3         4      5        6        7        8       9       10      11		   12		 13		      14			15			16	   17	18		19	
-							
+
 							//data.Add(new player(values[1], values[2], values[3], values[7], values[8], values[9], values[10],
 							//    values[11], values[12], values[13], values[14], values[16], values[17], values[18]));
 							//string name, string team, string position, string points, string lower, string upper, string sdPts, string positionRank, string dropoff, string tier, string ptSpread, string positionECR, string sdRank, string risk
 
 							//data.Add(new playerSingleGame(values[1], values[2], values[3], values[5], values[4], values[6], values[7],
 							//values[10], "0", "0", "0", "0", "0", "0"));
-							data.Add(new playerSingleGame(values[1], values[3], values[2], values[4], values[7], values[8], values[5],
-							values[15], values[6], values[16], "0", "0", "0", values[19]));
+							if (values[19] != "NA") { 
+								data.Add(new playerSingleGame(values[1], values[3], values[2], values[4], values[7], values[8], values[5],
+								values[15], values[6], values[16], "0", "0", "0", values[19]));
+							}
 						}
 					}
 					else first = true;
@@ -115,7 +117,7 @@ namespace ffaCalcualtor
 							if ((str3.Contains(str) && str2.Contains(pos)) || str4.Contains(str))
 							{
 								int salary = int.Parse(values[7].Replace("\"", ""));
-								//Console.WriteLine(str + "   " + str3 + "   " + str4 + "    " + salary + "   " + p.points);
+								Console.WriteLine(str + "   " + str3 + "   " + str4 + "    " + salary + "   " + p.points);
 								p.playerID = str1;
 								//Console.WriteLine(p.name + " " + p.risk);
 								p.setSalary(salary);
