@@ -26,10 +26,10 @@ namespace ffaCalcualtor
 		public static int numTeams = 150;
 		public static float usageRate = .3f;
 		//private static String path = "C:/Users/micha/Downloads/ffa_customrankings2020-10.csv";
-		private static String fdName = "Week10 - ffa (2)";
+		private static String fdName = "week16 - ffa (3)";
 		private static String path = "C:/Users/micha/Downloads/" + fdName + ".csv";
-		private static String path2 = "C:/Users/micha/Downloads/FanDuel-NFL-2022 ET-11 ET-13 ET-82959-players-list.csv";
-		private static string outputcsv = "C://Users/Micha/OneDrive/Documents/Fantasy/Football/week3/lineups/" + fdName + ".csv";
+		private static String path2 = "C:/Users/micha/Downloads/FanDuel-NFL-2023 ET-12 ET-24 ET-97405-players-list.csv";
+		private static string outputcsv = "C://Users/micha/OneDrive/Documents/Fantasy/Football/2023/" + fdName + ".csv";
 
 		private static List<Thread> threads = new List<Thread>();
         private static List<List<List<player>>> threadLineups = new List<List<List<player>>>();
@@ -38,15 +38,15 @@ namespace ffaCalcualtor
 		{ 
             //var scraper = new WebScraper.
 
-            readCSV(path, "ATL", "CAR", "SEA", "TB", "LAC", "SF", "WAS", "PHI");
+            readCSV(path, "LAR", "NO", "CIN", "PIT", "BUF", "LAC", "NE", "DEN", "LV", "KC", "NYG", "PHI", "BAL", "SF");
 			//readCSV(path);
 			//				QB  RB WR TE  DST 
-			setAllPositions(17, 10,10, 8, 5);
+			setAllPositions(17, 10, 9, 7, 5);
 			//setAllPositionsQb("Eli Manning", 12, 10, 10, 10);
 			//setAllPositionsDst(18, 12, 10, 10, "Patriots");
 			//Console.WriteLine(rb.Count);
-            findBest(rb, bestRB, 40);
-            findBest(wr, bestWR, 40);
+            findBest(rb, bestRB, 35);
+            findBest(wr, bestWR, 35);
             //findBest2(rb, bestRB, 30);
             //findBest4(wr, bestWR, 56);
             Console.WriteLine("RB " + bestRB.Count);
@@ -54,7 +54,7 @@ namespace ffaCalcualtor
             Console.WriteLine("QB " + qb.Count);
             Console.WriteLine("TE " + te.Count);
             Console.WriteLine("DST " + dst.Count);
-            findLineups(110, 600, 90);
+            findLineups(100, 700, 80);
             consolidateThreadRosters(threadLineups);
             Console.WriteLine(bestLineups.Count);
             printLineupsThreads();
@@ -88,11 +88,20 @@ namespace ffaCalcualtor
 
 		public static void readCSV(String path, string team1, string team2, string team3, string team4, string team5, string team6, string team7, string team8, string team9, string team10)
 		{
-			readFFA(path, team1, team2, team3, team4, team5, team6, team7, team8, team9, team10);
+			readCSV(path, team1, team2, team3, team4, team5, team6, team7, team8, team9, team10, null, null);
+		}
+		public static void readCSV(String path, string team1, string team2, string team3, string team4, string team5, string team6, string team7, string team8, string team9, string team10, string team11, string team12)
+		{ 
+			readCSV(path, team1, team2, team3, team4, team5, team6, team7, team8, team9, team10, team11, team12, null, null);
+		}
+
+		public static void readCSV(String path, string team1, string team2, string team3, string team4, string team5, string team6, string team7, string team8, string team9, string team10, string team11, string team12, string team13, string team14)
+		{
+			readFFA(path, team1, team2, team3, team4, team5, team6, team7, team8, team9, team10, team11, team12, null, null);
 			readFD();
 		}
 
-		private static void readFFA(String path, string team1, string team2, string team3, string team4, string team5, string team6, string team7, string team8, string team9, string team10)
+		private static void readFFA(String path, string team1, string team2, string team3, string team4, string team5, string team6, string team7, string team8, string team9, string team10, string team11, string team12, string team13, string team14)
 		{
 			using (var reader = new StreamReader(path))
 			{
@@ -103,7 +112,10 @@ namespace ffaCalcualtor
 					var values = line.Split(',');
 					if (first)
 					{
-						if (!values[2].Equals(team1) && !values[2].Equals(team2) && !values[2].Equals(team3) && !values[2].Equals(team4) && !values[2].Equals(team5) && !values[2].Equals(team6) && !values[2].Equals(team7) && !values[2].Equals(team8) && !values[2].Equals(team9) && !values[2].Equals(team10))
+						if (!values[3].Equals(team1) && !values[3].Equals(team2) && !values[3].Equals(team3) && !values[3].Equals(team4) && 
+							!values[3].Equals(team5) && !values[3].Equals(team6) && !values[3].Equals(team7) && !values[3].Equals(team8) && 
+							!values[3].Equals(team9) && !values[3].Equals(team10) && !values[3].Equals(team11) && !values[3].Equals(team12) &&
+							!values[3].Equals(team13) && !values[3].Equals(team14))
 						{
 							float points = 0;
 							float lower = 0;
@@ -113,7 +125,7 @@ namespace ffaCalcualtor
 							if (!values[7].Equals("NA") || values[7] != null) lower = float.Parse(values[7]);//8
 							if (!values[8].Equals("NA") || !values[8].Equals("")) upper = float.Parse(values[8]);//9
 							float left = (points - lower) / (upper - points);
-							//Console.WriteLine(values[1] + " " + points + "  " + lower + "  " + upper + "  " + left);
+							//Console.WriteLine(values[1] + " " + values[3] + " " + points + "  " + lower + "  " + upper + "  " + left);
 							if ((lower < points && upper > points) || values[3].Equals("\"DST\""))
 							{
 								//Console.WriteLine(left);
