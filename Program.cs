@@ -29,7 +29,7 @@ namespace ffaCalcualtor
 		private static String fdName = "week16 - ffa (3)";
 		private static String path = "C:/Users/micha/Downloads/" + fdName + ".csv";
 		private static String path2 = "C:/Users/micha/Downloads/FanDuel-NFL-2023 ET-12 ET-24 ET-97405-players-list.csv";
-		private static string outputcsv = "C://Users/micha/OneDrive/Documents/Fantasy/Football/2023/" + fdName + ".csv";
+		private static String outputcsv = "C://Users/micha/OneDrive/Documents/Fantasy/Football/2023/" + fdName + ".csv";
 
 		private static List<Thread> threads = new List<Thread>();
         private static List<List<List<player>>> threadLineups = new List<List<List<player>>>();
@@ -59,7 +59,7 @@ namespace ffaCalcualtor
             Console.WriteLine(bestLineups.Count);
             printLineupsThreads();
             //printLineups();
-            //outputCSV();
+            //outputCSV(outputcsv, Lineup);
             Console.WriteLine("done");
             Console.ReadKey();
         }
@@ -222,7 +222,7 @@ namespace ffaCalcualtor
                         best.Add(list.ElementAt(j));
                         best.Add(list.ElementAt(k));
 						//Console.WriteLine(list.ElementAt(i).name + "  " + list.ElementAt(j).name + "  " + list.ElementAt(k).name + "  " + sumPoints(best) + "   " + sumSalary(best));
-						if (sumPoints(best) > min)
+						if (SumHelper.sumPoints(best) > min)
                         {
                             //Console.WriteLine(list.ElementAt(i).name + "  " + list.ElementAt(j).name + "  " + list.ElementAt(k).name + "  " + sumPoints(best) + "   " + sumSalary(best));
                             temp.Add(best);
@@ -302,39 +302,18 @@ namespace ffaCalcualtor
                 //t.Join();
             }
         }
-	//	private static bool checkOtherUsage(List<player> team, List<List<player>> roster)
-	//	{
-	//		if (roster.Count < numTeams * usageRate * .5) return true;
-	//		int num = 0;
-	//		for (int i = 0; i < roster.Count; i++)
-	//		{
-	//			for (int j = 0; j < )
-	//		}
-	//	}
-	//
-	//	private static bool checkPlayers(List<player> a, List<player> b)
-	//	{
-	//		string[] pName = new string[] { };
-	//		for (int i = 0; i < a.Count; i++)
-	//		{
-	//			for (int j = 0; j < b.Count; j++)
-	//			{
-	//				if
-	//			}
-	//		}
-	//	}
 
         public static void checkRoster(List<List<player>> roster, List<player> newRoster)
         {
             int pos = 0;
             for (int t = 1; t < roster.Count; t++)
             {
-                if (sumPoints(roster.ElementAt(t)) < sumPoints(roster.ElementAt(pos)))
+                if (SumHelper.sumPoints(roster.ElementAt(t)) < SumHelper.sumPoints(roster.ElementAt(pos)))
                 {
                     pos = t;
                 }
             }
-            if (sumPoints(roster.ElementAt(pos)) < sumPoints(newRoster))
+            if (SumHelper.sumPoints(roster.ElementAt(pos)) < SumHelper.sumPoints(newRoster))
             {
                 //Console.WriteLine("remove and add a roster");
                 roster.RemoveAt(pos);
@@ -371,31 +350,8 @@ namespace ffaCalcualtor
                     else checkRoster(bestLineups, tRoster.ElementAt(i).ElementAt(j));
                 }
             }
-			bubbleSort(bestLineups);
+			Helper.bubbleSort(bestLineups);
         }
-
-		static void bubbleSort(List<List<player>> arr)
-		{
-			int n = arr.Count;
-			for (int i = 0; i < n - 1; i++)
-				for (int j = 0; j < n - i - 1; j++)
-					if (sumPoints(arr.ElementAt(j)) > sumPoints(arr.ElementAt(j + 1)))
-					{
-						// swap temp and arr[i]
-						List<player> temp = arr.ElementAt(j);
-						arr[j] = arr.ElementAt(j+1);
-						arr[j + 1] = temp;
-					}
-		}
-
-		/* Prints the array */
-		static void printArray(int[] arr)
-		{
-			int n = arr.Length;
-			for (int i = 0; i < n; ++i)
-				Console.Write(arr[i] + " ");
-			Console.WriteLine();
-		}
 
 		private static List<player> createLineup(int i, int j, int k, int a, int b, int points, int risk, int floor)
         {
@@ -415,10 +371,10 @@ namespace ffaCalcualtor
             temp.Add(dst.ElementAt(b));
 			//Console.WriteLine(sumPoints(temp) + "  " + sumFloor(temp) + "  " + sumRisk(temp) + "  " + sumSalary(temp));
 			//bool twoandfour = (bestRB.ElementAt(j).Count != 3 && bestWR.ElementAt(k).Count != 4) || (bestRB.ElementAt(j).Count != 2 && bestWR.ElementAt(k).Count != 3);
-			if (sumSalary(temp) <= 60000 && sumSalary(temp) > 59000)
+			if (SumHelper.sumSalary(temp) <= 60000 && SumHelper.sumSalary(temp) > 59000)
             {
                 //Console.WriteLine(sumPoints(temp) + "  " + sumFloor(temp) + "  " + sumRisk(temp) + "  " + sumSalary(temp));
-                if (sumPoints(temp) > points && sumFloor(temp) > floor && temp.Count == 9 && checkTeams(temp) && sumRisk(temp) < risk)
+                if (SumHelper.sumPoints(temp) > points && SumHelper.sumFloor(temp) > floor && temp.Count == 9 && checkTeams(temp) && SumHelper.sumRisk(temp) < risk)
                 {
                     return (temp);
                 }
@@ -471,10 +427,10 @@ namespace ffaCalcualtor
             temp.Add(te.ElementAt(a));
             temp.Add(dst.ElementAt(b));
             bool twoandfour = (bestRB.ElementAt(j).Count != 3 && bestWR.ElementAt(k).Count != 4) || (bestRB.ElementAt(j).Count != 2 && bestWR.ElementAt(k).Count != 3);
-            if (sumSalary(temp) <= 60000 && sumSalary(temp) > 59000)
+            if (SumHelper.sumSalary(temp) <= 60000 && SumHelper.sumSalary(temp) > 59000)
             {
                 //Console.WriteLine(sumPoints(best) + "  " + sumFloor(best) + "  " + sumRisk(best) + "  " + sumSalary(best));
-                if (sumPoints(temp) > points && sumSdPts(temp) < risk && sumFloor(temp) > floor && temp.Count == 9)
+                if (SumHelper.sumPoints(temp) > points && SumHelper.sumSdPts(temp) < risk && SumHelper.sumFloor(temp) > floor && temp.Count == 9)
                 {
                     bestLineups.Add(temp);
                 }
@@ -492,10 +448,10 @@ namespace ffaCalcualtor
                     List<player> lowestList = null;
                     foreach (List<player> p in Lineup)
                     {
-                        if (sumPoints(p) < sumPoints(list) && compareLists(list, p))
+                        if (SumHelper.sumPoints(p) < SumHelper.sumPoints(list) && Helper.compareLists(list, p))
                         {
 
-                            if (sumPoints(p) < sumPoints(lowestList) || sumPoints(lowestList) == 0)
+                            if (SumHelper.sumPoints(p) < SumHelper.sumPoints(lowestList) || SumHelper.sumPoints(lowestList) == 0)
                             {
                                 lowestList = p;
                             }
@@ -524,11 +480,11 @@ namespace ffaCalcualtor
             foreach(List<player> list in bestLineups)
             {
                 Console.WriteLine("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-                Console.WriteLine("points= " + sumPoints(list));
-                Console.WriteLine("salary= " + sumSalary(list));
-                Console.WriteLine("floor= " + sumFloor(list));
-                Console.WriteLine("Bell= " + sumBell(list));
-                Console.WriteLine("Same= " + findDifPlayers(best, list));
+                Console.WriteLine("points= " + SumHelper.sumPoints(list));
+                Console.WriteLine("salary= " + SumHelper.sumSalary(list));
+                Console.WriteLine("floor= " + SumHelper.sumFloor(list));
+                Console.WriteLine("Bell= " + SumHelper.sumBell(list));
+                Console.WriteLine("Same= " + Helper.findDifPlayers(best, list));
                 foreach (player p in list)
                 {
                     Console.WriteLine(p.name + ":" + p.salary + ":" +p.points);
@@ -540,7 +496,7 @@ namespace ffaCalcualtor
             List<player> best = Lineup[0];
             foreach(List<player> list in Lineup)
             {
-                if(sumPoints(list) > sumPoints(best))
+                if(SumHelper.sumPoints(list) > SumHelper.sumPoints(best))
                 {
                     best = list;
                 }
@@ -555,11 +511,11 @@ namespace ffaCalcualtor
 			foreach (List<player> list in bestLineups)
             {
                 Console.WriteLine("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-                Console.WriteLine("points= " + sumPoints(list));
-                Console.WriteLine("salary= " + sumSalary(list));
-                Console.WriteLine("floor= " + sumFloor(list));
-                Console.WriteLine("Bell= " + sumBell(list));
-                Console.WriteLine("Same= " + findDifPlayers(best, list));
+                Console.WriteLine("points= " + SumHelper.sumPoints(list));
+                Console.WriteLine("salary= " + SumHelper.sumSalary(list));
+                Console.WriteLine("floor= " + SumHelper.sumFloor(list));
+                Console.WriteLine("Bell= " + SumHelper.sumBell(list));
+                Console.WriteLine("Same= " + Helper.findDifPlayers(best, list));
 				string csvLineup = "";
 				int c = 0;
 				foreach (player p in list)
@@ -590,122 +546,12 @@ namespace ffaCalcualtor
             List<player> best = bestLineups[0];
             foreach (List<player> list in bestLineups)
             {
-                if (sumPoints(list) > sumPoints(best))
+                if (SumHelper.sumPoints(list) > SumHelper.sumPoints(best))
                 {
                     best = list;
                 }
             }
             return best;
-        }
-
-        public static int findDifPlayers(List<player> best, List<player> list)
-        {
-            int same = 0;
-            foreach(player pb in best)
-            {
-                foreach(player pl in list)
-                {
-                    //Console.WriteLine(pb.name + " " + pl.name);
-                    if(pb.name.Equals(pl.name))
-                    {
-                        same++;
-                    }
-                }
-            }
-            return same;
-        }
-        public static bool compareLists(List<player> list1, List<player> list2)
-        {
-            int count = 0;
-            foreach(player p in list1)
-            {
-                foreach(player p2 in list2)
-                {
-                    if (p2.Equals(p))
-                    {
-                        count++;
-                        break;
-                    }
-                }
-            }
-            if (count < 9) return true;
-            else return false;
-        }
-
-        public static float sumPoints(List<player> list)
-        {
-            if(list != null)
-            {
-                float sum = 0;
-                foreach (player p in list)
-                {
-                    sum += p.points;
-                }
-                return sum;
-            }
-            return 0;
-            
-        }
-        public static int sumSalary(List<player> list)
-        {
-            int sum = 0;
-            foreach (player p in list)
-            {
-                sum += p.salary;
-            }
-            return sum;
-        }
-        public static float sumSdPts(List<player> list)
-        {
-            float sum = 0;
-            foreach (player p in list)
-            {
-                sum += p.sdPts;
-            }
-            return sum;
-        }
-        public static float sumBell(List<player> list)
-        {
-            float sum = 0;
-            foreach (player p in list)
-            {
-                sum += (p.upper - p.points)/(p.points - p.lower);
-            }
-            return sum;
-        }
-
-        public static float sumRisk(List<player> list)
-        {
-            float sum = 0;
-            foreach (player p in list)
-            {
-                sum += p.risk;
-            }
-            return sum;
-        }
-        public static float sumFloor(List<player> list)
-        {
-            float sum = 0;
-            foreach (player p in list)
-            {
-                sum += p.lower;
-            }
-            return sum;
-        }
-        public static void outputCSV()
-        {
-            string header = "position" + ", " + "name" + ", " + "points" + ", " + "lower" + ", " + "salary" + ", " + "risk\n";
-            File.WriteAllText(outputcsv, header);
-            foreach (List<player> list in Lineup)
-            {
-                foreach(player p in list)
-                {
-                    File.WriteAllText(outputcsv, p.toString());
-                }
-                string sums = "" + ", " + "" + ", " + sumPoints(list) + ", " + sumFloor(list) + ", " + sumSalary(list) + ", " + sumRisk(list)+"\n";
-                File.WriteAllText(outputcsv, sums + "\n");
-                File.WriteAllText(outputcsv, "\n");
-            }
         }
     }
 
