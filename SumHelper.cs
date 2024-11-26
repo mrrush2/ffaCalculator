@@ -8,11 +8,11 @@ namespace ffaCalcualtor
 {
 	class SumHelper
 	{
-		public static float sumPoints(List<player> list)
+		public static double sumPoints(List<player> list)
 		{
 			if (list != null)
 			{
-				float sum = 0;
+				double sum = 0;
 				foreach (player p in list)
 				{
 					sum += p.points;

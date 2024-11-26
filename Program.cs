@@ -26,9 +26,10 @@ namespace ffaCalcualtor
 		public static int numTeams = 150;
 		public static float usageRate = .3f;
 		//private static String path = "C:/Users/micha/Downloads/ffa_customrankings2020-10.csv";
-		private static String fdName = "week16 - ffa (3)";
+		private static String fdName = "wk12 - ffa";
 		private static String path = "C:/Users/micha/Downloads/" + fdName + ".csv";
-		private static String path2 = "C:/Users/micha/Downloads/FanDuel-NFL-2023 ET-12 ET-24 ET-97405-players-list.csv";
+		private static String FDCostName = "FanDuel-NFL-2024 CST-11 CST-24 CST-109714-players-list";
+		private static String path2 = "C:/Users/micha/Downloads/" + FDCostName + ".csv";
 		private static String outputcsv = "C://Users/micha/OneDrive/Documents/Fantasy/Football/2023/" + fdName + ".csv";
 
 		private static List<Thread> threads = new List<Thread>();
@@ -38,14 +39,14 @@ namespace ffaCalcualtor
 		{ 
             //var scraper = new WebScraper.
 
-            readCSV(path, "LAR", "NO", "CIN", "PIT", "BUF", "LAC", "NE", "DEN", "LV", "KC", "NYG", "PHI", "BAL", "SF");
+            readCSV(path, "LAC", "BAL", "PIT", "CLE");
 			//readCSV(path);
 			//				QB  RB WR TE  DST 
-			setAllPositions(17, 10, 9, 7, 5);
+			setAllPositions(17, 10, 7.5, 6, 4.6);
 			//setAllPositionsQb("Eli Manning", 12, 10, 10, 10);
 			//setAllPositionsDst(18, 12, 10, 10, "Patriots");
 			//Console.WriteLine(rb.Count);
-            findBest(rb, bestRB, 35);
+            findBest(rb, bestRB, 38);
             findBest(wr, bestWR, 35);
             //findBest2(rb, bestRB, 30);
             //findBest4(wr, bestWR, 56);
@@ -169,7 +170,6 @@ namespace ffaCalcualtor
 							if (str2.Equals("D")) str2 = "DST";
 							string str3 = values[3].Replace("\"", "");
 							string str4 = values[4].Replace("\"", "");
-							// Console.WriteLine(pos + "   " + str2);
 							if ((str3.Contains(str) && str2.Contains(pos)) || str4.Contains(str))
 							{
 								int salary = int.Parse(values[7].Replace("\"", ""));
@@ -208,7 +208,7 @@ namespace ffaCalcualtor
             }
         }
 
-        public static void findBest(List<player> list, List<List<player>> temp, float min)
+        public static void findBest(List<player> list, List<List<player>> temp, double min)
         {
             
             for(int i = 0; i < list.Count; i++)
@@ -224,7 +224,7 @@ namespace ffaCalcualtor
 						//Console.WriteLine(list.ElementAt(i).name + "  " + list.ElementAt(j).name + "  " + list.ElementAt(k).name + "  " + sumPoints(best) + "   " + sumSalary(best));
 						if (SumHelper.sumPoints(best) > min)
                         {
-                            //Console.WriteLine(list.ElementAt(i).name + "  " + list.ElementAt(j).name + "  " + list.ElementAt(k).name + "  " + sumPoints(best) + "   " + sumSalary(best));
+                            //Console.WriteLine(list.ElementAt(i).name + "  " + list.ElementAt(j).name + "  " + list.ElementAt(k).name + "  " + SumHelper.sumPoints(best) + "   " + SumHelper.sumSalary(best));
                             temp.Add(best);
                         }
                     }
@@ -372,8 +372,10 @@ namespace ffaCalcualtor
 			//Console.WriteLine(sumPoints(temp) + "  " + sumFloor(temp) + "  " + sumRisk(temp) + "  " + sumSalary(temp));
 			//bool twoandfour = (bestRB.ElementAt(j).Count != 3 && bestWR.ElementAt(k).Count != 4) || (bestRB.ElementAt(j).Count != 2 && bestWR.ElementAt(k).Count != 3);
 			if (SumHelper.sumSalary(temp) <= 60000 && SumHelper.sumSalary(temp) > 59000)
-            {
-                //Console.WriteLine(sumPoints(temp) + "  " + sumFloor(temp) + "  " + sumRisk(temp) + "  " + sumSalary(temp));
+			{
+				if (SumHelper.sumPoints(temp) > 119.9 && SumHelper.sumPoints(temp) < 120 && SumHelper.sumSalary(temp) == 59600 && SumHelper.sumRisk(temp) == 501) { 
+					Console.WriteLine(SumHelper.sumPoints(temp) + "  " + SumHelper.sumFloor(temp) + "  " + SumHelper.sumRisk(temp) + "  " + SumHelper.sumSalary(temp));
+				}
                 if (SumHelper.sumPoints(temp) > points && SumHelper.sumFloor(temp) > floor && temp.Count == 9 && checkTeams(temp) && SumHelper.sumRisk(temp) < risk)
                 {
                     return (temp);
